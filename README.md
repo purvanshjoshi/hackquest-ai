@@ -72,7 +72,7 @@ India's 1.39M+ hackathon participants face a critical pain point: **scattered pr
                               │ Internal Async Calls
 ┌─────────────────────────────▼──────────────────────────────────┐
 │                    Agentic Core (LangGraph)                    │
-│    Llama-3.1-8B (Ollama) + Sentence Transformers              │
+│    Llama-3.1-8B (Groq) + Sentence Transformers              │
 │  ┌──────────────┬──────────────┬──────────────────────────┐   │
 │  │ DataAgent    │ ProfileAgent  │ MatchAgent  | GenAgent  │   │
 │  │ (Scraping)   │ (GitHub API)  │ (Pinecone)  | (Codegen) │   │
@@ -103,7 +103,7 @@ India's 1.39M+ hackathon participants face a critical pain point: **scattered pr
 |-------|------------|
 | **Frontend** | React 19, TypeScript, Tailwind CSS, React Query |
 | **Backend** | FastAPI 0.115, Uvicorn, Pydantic |
-| **Agents** | LangGraph, Llama-3.1-8B (Ollama), Sentence Transformers |
+| **Agents** | LangGraph, Llama-3.1-8B (Groq), Sentence Transformers |
 | **Databases** | MongoDB, Pinecone Vector DB, Redis |
 | **Scraping** | Scrapy, Playwright, BeautifulSoup |
 | **Auth** | NextAuth.js, GitHub OAuth 2.0 |
@@ -167,12 +167,8 @@ REDIS_URL=redis://localhost:6379
 PINCONE_API_KEY=your-pinecone-key
 PINCONE_INDEX_NAME=hackathon-problems
 
-# Ollama
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama2
-
-# LLM Configuration
-LANGCHAIN_API_KEY=your-langchain-key
+# Groq
+GROQ_API_KEY=your-groq-api-keyLANGCHAIN_API_KEY=your-langchain-key
 ```
 
 ## Usage
@@ -308,7 +304,7 @@ hackquest-ai/
 │   │   │   └── submission.py
 │   │   └── utils/
 │   │       ├── github_client.py    # Recursive repo parsing logic
-│   │       ├── vectorizer.py       # Sentence-Transformers / Ollama Embeds
+│   │       ├── vectorizer.py       # Sentence-Transformers / Groq Embeds
 │   │       └── prompts.py          # System Prompts for Llama-3.1
 │   ├── requirements.txt
 │   ├── Dockerfile
@@ -357,7 +353,7 @@ hackquest-ai/
 │
 ├── docker/                         # Deployment
 │   ├── Dockerfile                  # Backend Dockerfile
-│   ├── docker-compose.yml          # Mongo + Redis + Ollama + App
+│   ├── docker-compose.yml          # Mongo + Redis + Groq + App
 │   └── .dockerignore
 │
 └── .gitignore
