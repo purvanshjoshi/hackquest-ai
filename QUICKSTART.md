@@ -150,8 +150,8 @@ PORT=9000  # Change from default 8000
 ### Change Database URLs
 ```env
 # .env
-MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net
-REDIS_URL=redis://user:pass@redis-cloud.example.com
+MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority
+REDIS_URL=redis://username:password@hostname:port
 ```
 
 ### Adjust Logging
