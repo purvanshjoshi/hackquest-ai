@@ -14,22 +14,18 @@ from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncDatabase
 
 logger = logging.getLogger(__name__)
-
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
 def hash_password(password: str) -> str:
     """Hash password using bcrypt"""
     return pwd_context.hash(password)
 
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""
     return pwd_context.verify(plain_password, hashed_password)
-
 
 def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None) -> str:
     """Create JWT access token"""
@@ -47,7 +43,6 @@ def create_access_token(user_id: str, expires_delta: Optional[timedelta] = None)
     token = jwt.encode(payload, settings.jwt_secret, algorithm="HS256")
     return token
 
-
 def verify_token(token: str) -> str:
     """Verify JWT token and return user_id"""
     try:
@@ -61,7 +56,6 @@ def verify_token(token: str) -> str:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-
 async def get_current_user(token: str, db: AsyncDatabase = Depends(get_db)):
     """Get current authenticated user"""
     try:
@@ -73,7 +67,6 @@ async def get_current_user(token: str, db: AsyncDatabase = Depends(get_db)):
         return user
     except HTTPException:
         raise
-
 
 @router.post("/register", response_model=TokenResponse)
 async def register(req: RegisterRequest, db: AsyncDatabase = Depends(get_db)):
@@ -132,7 +125,6 @@ async def register(req: RegisterRequest, db: AsyncDatabase = Depends(get_db)):
             detail="Registration failed"
         )
 
-
 @router.post("/login", response_model=TokenResponse)
 async def login(req: LoginRequest, db: AsyncDatabase = Depends(get_db)):
     """Login user"""
@@ -177,7 +169,6 @@ async def login(req: LoginRequest, db: AsyncDatabase = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed"
         )
-
 
 @router.post("/oauth/github", response_model=TokenResponse)
 async def github_oauth(code: str, db: AsyncDatabase = Depends(get_db)):
@@ -246,7 +237,6 @@ async def github_oauth(code: str, db: AsyncDatabase = Depends(get_db)):
             detail="GitHub authentication failed"
         )
 
-
 @router.post("/oauth/google", response_model=TokenResponse)
 async def google_oauth(id_token: str, db: AsyncDatabase = Depends(get_db)):
     """Google OAuth login"""
@@ -307,7 +297,6 @@ async def google_oauth(id_token: str, db: AsyncDatabase = Depends(get_db)):
             detail="Google authentication failed"
         )
 
-
 @router.get("/me", response_model=UserResponse)
 async def get_me(token: str, db: AsyncDatabase = Depends(get_db)):
     """Get current user info"""
@@ -337,115 +326,3 @@ async def get_me(token: str, db: AsyncDatabase = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve user"
         )
-            "full_name": req.full_name,
-            "password_hash": hash_password(req.password),
-            "avatar_url": None,
-            "bio": None,
-            "skills": [],
-            "github_username": None,
-            "github_profile_url": None,
-            "github_stars": 0,
-            "github_repos": 0,
-            "github_followers": 0,
-            "hackathons_participated": 0,
-            "hackathons_won": 0,
-            "win_rate": 0.0,
-            "status": "active",
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
-        }
-        
-        result = await Collections.users().insert_one(user_doc)
-        user_id = str(result.inserted_id)
-        
-        # Generate tokens
-        access_token = create_access_token(user_id)
-        refresh_token = create_access_token(user_id, expires_delta=timedelta(days=7))
-        
-        logger.info(f"User registered: {req.email}")
-        
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=86400  # 24 hours
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Registration error: {e}")
-        raise HTTPException(status_code=500, detail="Registration failed")
-
-
-@router.post("/login", response_model=TokenResponse)
-async def login(req: LoginRequest):
-    """Login user"""
-    try:
-        # Find user
-        user = await Collections.users().find_one({"email": req.email})
-        if not user or not verify_password(req.password, user.get("password_hash", "")):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials"
-            )
-        
-        # Generate tokens
-        user_id = str(user["_id"])
-        access_token = create_access_token(user_id)
-        refresh_token = create_access_token(user_id, expires_delta=timedelta(days=7))
-        
-        logger.info(f"User logged in: {req.email}")
-        
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=86400
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Login error: {e}")
-        raise HTTPException(status_code=500, detail="Login failed")
-
-
-@router.post("/verify")
-async def verify(token: str):
-    """Verify token validity"""
-    try:
-        user_id = verify_token(token)
-        return {
-            "success": True,
-            "user_id": user_id,
-            "message": "Token is valid"
-        }
-    except HTTPException as e:
-        return {"success": False, "error": str(e.detail)}
-
-
-@router.post("/refresh", response_model=TokenResponse)
-async def refresh(refresh_token: str):
-    """Refresh access token"""
-    try:
-        user_id = verify_token(refresh_token)
-        access_token = create_access_token(user_id)
-        new_refresh_token = create_access_token(user_id, expires_delta=timedelta(days=7))
-        
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=new_refresh_token,
-            expires_in=86400
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Token refresh error: {e}")
-        raise HTTPException(status_code=500, detail="Token refresh failed")
-
-
-@router.post("/logout")
-async def logout():
-    """Logout user"""
-    return {"success": True, "message": "Logged out successfully"}
-
