@@ -28,14 +28,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         try {
             const result = await apiClient.login(email, password);
 
-            localStorage.setItem('user', JSON.stringify(result.user));
+            const userInfo = {
+                email: result.user.email,
+                username: result.user.username,
+                id: result.user.id
+            };
+            localStorage.setItem('user', JSON.stringify(userInfo));
 
             if (onLoginSuccess) {
-                onLoginSuccess({
-                    email: result.user.email,
-                    username: result.user.username,
-                    id: result.user.id
-                });
+                onLoginSuccess(userInfo);
             }
         } catch (err) {
             console.error('Login error:', err);
@@ -56,14 +57,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 'password123'
             );
 
-            localStorage.setItem('user', JSON.stringify(result.user));
+            const userInfo = {
+                email: result.user.email,
+                username: result.user.username,
+                id: result.user.id
+            };
+            localStorage.setItem('user', JSON.stringify(userInfo));
 
             if (onLoginSuccess) {
-                onLoginSuccess({
-                    email: result.user.email,
-                    username: result.user.username,
-                    id: result.user.id
-                });
+                onLoginSuccess(userInfo);
             }
         } catch (err) {
             console.error('GitHub login error:', err);
@@ -84,14 +86,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 'password123'
             );
 
-            localStorage.setItem('user', JSON.stringify(result.user));
+            const userInfo = {
+                email: result.user.email,
+                username: result.user.username,
+                id: result.user.id
+            };
+            localStorage.setItem('user', JSON.stringify(userInfo));
 
             if (onLoginSuccess) {
-                onLoginSuccess({
-                    email: result.user.email,
-                    username: result.user.username,
-                    id: result.user.id
-                });
+                onLoginSuccess(userInfo);
             }
         } catch (err) {
             console.error('Google login error:', err);
