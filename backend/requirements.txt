@@ -30,7 +30,7 @@ numpy==1.24.3
 
 # API & HTTP
 httpx==0.25.1
-requests==2.32.0
+requests==2.32.4
 
 # Data & Scraping (Optional for Scrapy)
 beautifulsoup4==4.12.2
