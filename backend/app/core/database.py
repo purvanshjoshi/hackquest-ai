@@ -3,7 +3,6 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase, AsyncIOMotorCollection
 from pymongo.errors import ServerSelectionTimeoutError
 from contextlib import asynccontextmanager
-from pinecone import Pinecone
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -11,7 +10,29 @@ logger = logging.getLogger(__name__)
 # Global database instances
 _db: AsyncIOMotorDatabase | None = None
 _client: AsyncIOMotorClient | None = None
-pinecone_index = None
+_pinecone_index = None
+
+
+def get_pinecone_index():
+    """Get or initialize Pinecone index (lazy initialization)"""
+    global _pinecone_index
+    
+    if _pinecone_index is None:
+        try:
+            from pinecone import Pinecone
+            api_key = settings.pinecone_api_key.strip()
+            pc = Pinecone(api_key=api_key)
+            _pinecone_index = pc.Index(settings.pinecone_index)
+            logger.info(f"✅ Pinecone initialized for index: {settings.pinecone_index}")
+        except Exception as e:
+            logger.error(f"❌ Pinecone initialization error: {e}")
+            return None
+    
+    return _pinecone_index
+
+
+# Alias for backward compatibility
+pinecone_index = None  # Will be set on first access via get_pinecone_index()
 
 
 async def init_db() -> AsyncIOMotorDatabase:
@@ -67,21 +88,6 @@ async def get_db_context():
         yield db
     except Exception as e:
         logger.error(f"Database operation error: {e}")
-        raise
-
-
-async def init_pinecone():
-    """Initialize Pinecone vector database"""
-    global pinecone_index
-    
-    try:
-        api_key = settings.pinecone_api_key.strip()
-        pc = Pinecone(api_key=api_key)
-        pinecone_index = pc.Index(settings.pinecone_index)
-        logger.info(f"✅ Pinecone connected to index: {settings.pinecone_index}")
-        return pinecone_index
-    except Exception as e:
-        logger.error(f"❌ Pinecone connection error: {e}")
         raise
 
 

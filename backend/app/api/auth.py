@@ -337,47 +337,6 @@ async def get_me(token: str, db: AsyncDatabase = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve user"
         )
-            "full_name": req.full_name,
-            "password_hash": hash_password(req.password),
-            "avatar_url": None,
-            "bio": None,
-            "skills": [],
-            "github_username": None,
-            "github_profile_url": None,
-            "github_stars": 0,
-            "github_repos": 0,
-            "github_followers": 0,
-            "hackathons_participated": 0,
-            "hackathons_won": 0,
-            "win_rate": 0.0,
-            "status": "active",
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
-        }
-        
-        result = await Collections.users().insert_one(user_doc)
-        user_id = str(result.inserted_id)
-        
-        # Generate tokens
-        access_token = create_access_token(user_id)
-        refresh_token = create_access_token(user_id, expires_delta=timedelta(days=7))
-        
-        logger.info(f"User registered: {req.email}")
-        
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=86400  # 24 hours
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Registration error: {e}")
-        raise HTTPException(status_code=500, detail="Registration failed")
-
-
-@router.post("/login", response_model=TokenResponse)
 async def login(req: LoginRequest):
     """Login user"""
     try:

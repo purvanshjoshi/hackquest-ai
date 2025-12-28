@@ -141,20 +141,23 @@ class APIClient {
         return data;
     }
 
-    async refreshToken(): Promise<AuthResponse> {
+    async refreshToken(refresh_token?: string): Promise<AuthResponse> {
+        const token = refresh_token || localStorage.getItem("refresh_token");
         const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
             method: "POST",
             headers: this.getHeaders(),
+            body: JSON.stringify({ refresh_token: token }),
         });
 
         const data = await this.handleResponse<AuthResponse>(response);
         this.setToken(data.access_token);
+        localStorage.setItem("refresh_token", data.access_token);
         return data;
     }
 
     // Profile endpoints
-    async getProfile() {
-        const response = await fetch(`${this.baseUrl}/api/auth/me?token=${this.token}`, {
+    async getProfile(userId: string) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}`, {
             method: "GET",
             headers: this.getHeaders(),
         });
@@ -162,18 +165,33 @@ class APIClient {
         return this.handleResponse(response);
     }
 
-    async updateProfile(data: Record<string, any>) {
-        // Profile updates would be done via a separate endpoint
-        // For now, storing in localStorage
-        localStorage.setItem("user", JSON.stringify(data));
-        return data;
+    async updateProfile(userId: string, data: Record<string, any>) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}`, {
+            method: "PATCH",
+            headers: this.getHeaders(),
+            body: JSON.stringify(data),
+        });
+
+        return this.handleResponse(response);
     }
 
-    async syncGitHub(githubToken: string) {
-        // GitHub sync would be implemented via a separate endpoint
-        // For now, just storing the token
-        localStorage.setItem("github_token", githubToken);
-        return { success: true };
+    async syncGitHub(userId: string, githubUsername: string) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}/sync-github`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify({ github_username: githubUsername }),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async getProfileStats(userId: string) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}/stats`, {
+            method: "GET",
+            headers: this.getHeaders(),
+        });
+
+        return this.handleResponse(response);
     }
 
     // Matching endpoints
@@ -189,19 +207,18 @@ class APIClient {
         return this.handleResponse<{ data: HackathonMatch[] }>(response);
     }
 
-    async findMatches(filters?: Record<string, any>) {
-        const query = new URLSearchParams();
+    async findMatches(skills: string[], filters?: Record<string, any>) {
+        const body: any = { skills };
         if (filters) {
-            Object.entries(filters).forEach(([key, value]) => {
-                query.append(key, String(value));
-            });
+            body.filters = filters;
         }
 
         const response = await fetch(
-            `${this.baseUrl}/api/matching/find?${query.toString()}`,
+            `${this.baseUrl}/api/matching/find`,
             {
-                method: "GET",
+                method: "POST",
                 headers: this.getHeaders(),
+                body: JSON.stringify(body),
             }
         );
 
@@ -218,6 +235,50 @@ class APIClient {
         );
 
         return this.handleResponse<{ data: HackathonMatch }>(response);
+    }
+
+    async updateUserProfile(userId: string, skills: string[], experience: string) {
+        const response = await fetch(
+            `${this.baseUrl}/api/matching/profile/update`,
+            {
+                method: "POST",
+                headers: this.getHeaders(),
+                body: JSON.stringify({ user_id: userId, skills, experience }),
+            }
+        );
+
+        return this.handleResponse(response);
+    }
+
+    async createHackathon(hackathonData: Record<string, any>) {
+        const response = await fetch(
+            `${this.baseUrl}/api/matching/hackathons`,
+            {
+                method: "POST",
+                headers: this.getHeaders(),
+                body: JSON.stringify(hackathonData),
+            }
+        );
+
+        return this.handleResponse(response);
+    }
+
+    async searchHackathons(query: string, filters?: Record<string, any>) {
+        const body: any = { query };
+        if (filters) {
+            body.filters = filters;
+        }
+
+        const response = await fetch(
+            `${this.baseUrl}/api/matching/hackathons/search`,
+            {
+                method: "POST",
+                headers: this.getHeaders(),
+                body: JSON.stringify(body),
+            }
+        );
+
+        return this.handleResponse(response);
     }
 
     // Agent endpoints
@@ -247,9 +308,26 @@ class APIClient {
 
     async scoreMatch(userId: string, hackathonId: string) {
         const response = await fetch(
-            `${this.baseUrl}/api/agent/matches/score?user_id=${userId}&hackathon_id=${hackathonId}`,
+            `${this.baseUrl}/api/agent/matches/score`,
             {
                 method: "POST",
+                headers: this.getHeaders(),
+                body: JSON.stringify({ user_id: userId, hackathon_id: hackathonId }),
+            }
+        );
+
+        return this.handleResponse(response);
+    }
+
+    async getHackathonsList(limit?: number, offset?: number) {
+        const params = new URLSearchParams();
+        if (limit) params.append("limit", String(limit));
+        if (offset) params.append("offset", String(offset));
+
+        const response = await fetch(
+            `${this.baseUrl}/api/matching/hackathons?${params.toString()}`,
+            {
+                method: "GET",
                 headers: this.getHeaders(),
             }
         );
@@ -268,21 +346,31 @@ class APIClient {
         return this.handleResponse(response);
     }
 
-    async explainCode(code: string) {
-        const response = await fetch(`${this.baseUrl}/api/generate/code/explain`, {
+    async explainCode(code: string, language?: string) {
+        const response = await fetch(`${this.baseUrl}/api/generate/explain`, {
             method: "POST",
             headers: this.getHeaders(),
-            body: JSON.stringify({ code }),
+            body: JSON.stringify({ code, language }),
         });
 
         return this.handleResponse(response);
     }
 
-    async optimizeCode(code: string) {
-        const response = await fetch(`${this.baseUrl}/api/generate/code/optimize`, {
+    async optimizeCode(code: string, language?: string) {
+        const response = await fetch(`${this.baseUrl}/api/generate/optimize`, {
             method: "POST",
             headers: this.getHeaders(),
-            body: JSON.stringify({ code }),
+            body: JSON.stringify({ code, language }),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async refactorCode(code: string, language?: string) {
+        const response = await fetch(`${this.baseUrl}/api/generate/refactor`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify({ code, language }),
         });
 
         return this.handleResponse(response);
@@ -296,6 +384,43 @@ class APIClient {
         });
 
         return this.handleResponse(response);
+    }
+
+    // WebSocket connections
+    connectAgentStream(userId: string, onMessage: (data: any) => void, onError: (error: Event) => void): WebSocket {
+        const wsUrl = `${this.baseUrl.replace(/^http/, 'ws')}/ws/agent/${userId}`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                onMessage(data);
+            } catch (e) {
+                console.error('Failed to parse WebSocket message:', e);
+            }
+        };
+
+        ws.onerror = onError;
+
+        return ws;
+    }
+
+    connectNotificationStream(userId: string, onMessage: (data: any) => void, onError: (error: Event) => void): WebSocket {
+        const wsUrl = `${this.baseUrl.replace(/^http/, 'ws')}/ws/notifications/${userId}`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                onMessage(data);
+            } catch (e) {
+                console.error('Failed to parse WebSocket message:', e);
+            }
+        };
+
+        ws.onerror = onError;
+
+        return ws;
     }
 
     // Logout

@@ -58,36 +58,46 @@ class APIClient {
         this.setToken(data.access_token);
         return data;
     }
-    async refreshToken() {
-        const response = await fetch(`${this.baseUrl}/api/auth/token/refresh`, {
+    async refreshToken(refresh_token) {
+        const token = refresh_token || localStorage.getItem("refresh_token");
+        const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
             method: "POST",
             headers: this.getHeaders(),
+            body: JSON.stringify({ refresh_token: token }),
         });
         const data = await this.handleResponse(response);
         this.setToken(data.access_token);
+        localStorage.setItem("refresh_token", data.access_token);
         return data;
     }
     // Profile endpoints
-    async getProfile() {
-        const response = await fetch(`${this.baseUrl}/api/profile`, {
+    async getProfile(userId) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}`, {
             method: "GET",
             headers: this.getHeaders(),
         });
         return this.handleResponse(response);
     }
-    async updateProfile(data) {
-        const response = await fetch(`${this.baseUrl}/api/profile`, {
-            method: "PUT",
+    async updateProfile(userId, data) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}`, {
+            method: "PATCH",
             headers: this.getHeaders(),
             body: JSON.stringify(data),
         });
         return this.handleResponse(response);
     }
-    async syncGitHub(githubUsername) {
-        const response = await fetch(`${this.baseUrl}/api/profile/sync-github`, {
+    async syncGitHub(userId, githubUsername) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}/sync-github`, {
             method: "POST",
             headers: this.getHeaders(),
             body: JSON.stringify({ github_username: githubUsername }),
+        });
+        return this.handleResponse(response);
+    }
+    async getProfileStats(userId) {
+        const response = await fetch(`${this.baseUrl}/api/profile/${userId}/stats`, {
+            method: "GET",
+            headers: this.getHeaders(),
         });
         return this.handleResponse(response);
     }
@@ -99,16 +109,15 @@ class APIClient {
         });
         return this.handleResponse(response);
     }
-    async findMatches(filters) {
-        const query = new URLSearchParams();
+    async findMatches(skills, filters) {
+        const body = { skills };
         if (filters) {
-            Object.entries(filters).forEach(([key, value]) => {
-                query.append(key, String(value));
-            });
+            body.filters = filters;
         }
-        const response = await fetch(`${this.baseUrl}/api/matching/find?${query.toString()}`, {
-            method: "GET",
+        const response = await fetch(`${this.baseUrl}/api/matching/find`, {
+            method: "POST",
             headers: this.getHeaders(),
+            body: JSON.stringify(body),
         });
         return this.handleResponse(response);
     }
@@ -116,6 +125,34 @@ class APIClient {
         const response = await fetch(`${this.baseUrl}/api/matching/${hackathonId}`, {
             method: "GET",
             headers: this.getHeaders(),
+        });
+        return this.handleResponse(response);
+    }
+    async updateUserProfile(userId, skills, experience) {
+        const response = await fetch(`${this.baseUrl}/api/matching/profile/update`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify({ user_id: userId, skills, experience }),
+        });
+        return this.handleResponse(response);
+    }
+    async createHackathon(hackathonData) {
+        const response = await fetch(`${this.baseUrl}/api/matching/hackathons`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify(hackathonData),
+        });
+        return this.handleResponse(response);
+    }
+    async searchHackathons(query, filters) {
+        const body = { query };
+        if (filters) {
+            body.filters = filters;
+        }
+        const response = await fetch(`${this.baseUrl}/api/matching/hackathons/search`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify(body),
         });
         return this.handleResponse(response);
     }
@@ -136,8 +173,21 @@ class APIClient {
         return this.handleResponse(response);
     }
     async scoreMatch(userId, hackathonId) {
-        const response = await fetch(`${this.baseUrl}/api/agent/matches/score?user_id=${userId}&hackathon_id=${hackathonId}`, {
+        const response = await fetch(`${this.baseUrl}/api/agent/matches/score`, {
             method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify({ user_id: userId, hackathon_id: hackathonId }),
+        });
+        return this.handleResponse(response);
+    }
+    async getHackathonsList(limit, offset) {
+        const params = new URLSearchParams();
+        if (limit)
+            params.append("limit", String(limit));
+        if (offset)
+            params.append("offset", String(offset));
+        const response = await fetch(`${this.baseUrl}/api/matching/hackathons?${params.toString()}`, {
+            method: "GET",
             headers: this.getHeaders(),
         });
         return this.handleResponse(response);
@@ -151,19 +201,27 @@ class APIClient {
         });
         return this.handleResponse(response);
     }
-    async explainCode(code) {
-        const response = await fetch(`${this.baseUrl}/api/generate/code/explain`, {
+    async explainCode(code, language) {
+        const response = await fetch(`${this.baseUrl}/api/generate/explain`, {
             method: "POST",
             headers: this.getHeaders(),
-            body: JSON.stringify({ code }),
+            body: JSON.stringify({ code, language }),
         });
         return this.handleResponse(response);
     }
-    async optimizeCode(code) {
-        const response = await fetch(`${this.baseUrl}/api/generate/code/optimize`, {
+    async optimizeCode(code, language) {
+        const response = await fetch(`${this.baseUrl}/api/generate/optimize`, {
             method: "POST",
             headers: this.getHeaders(),
-            body: JSON.stringify({ code }),
+            body: JSON.stringify({ code, language }),
+        });
+        return this.handleResponse(response);
+    }
+    async refactorCode(code, language) {
+        const response = await fetch(`${this.baseUrl}/api/generate/refactor`, {
+            method: "POST",
+            headers: this.getHeaders(),
+            body: JSON.stringify({ code, language }),
         });
         return this.handleResponse(response);
     }
@@ -174,6 +232,37 @@ class APIClient {
             headers: this.getHeaders(),
         });
         return this.handleResponse(response);
+    }
+    // WebSocket connections
+    connectAgentStream(userId, onMessage, onError) {
+        const wsUrl = `${this.baseUrl.replace(/^http/, 'ws')}/ws/agent/${userId}`;
+        const ws = new WebSocket(wsUrl);
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                onMessage(data);
+            }
+            catch (e) {
+                console.error('Failed to parse WebSocket message:', e);
+            }
+        };
+        ws.onerror = onError;
+        return ws;
+    }
+    connectNotificationStream(userId, onMessage, onError) {
+        const wsUrl = `${this.baseUrl.replace(/^http/, 'ws')}/ws/notifications/${userId}`;
+        const ws = new WebSocket(wsUrl);
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                onMessage(data);
+            }
+            catch (e) {
+                console.error('Failed to parse WebSocket message:', e);
+            }
+        };
+        ws.onerror = onError;
+        return ws;
     }
     // Logout
     logout() {

@@ -1,5 +1,5 @@
 """Authentication endpoints with SQLite persistence and security hardening."""
-from fastapi import APIRouter, HTTPException, Depends, status, Header, Request
+from fastapi import APIRouter, HTTPException, Depends, status, Header, Request, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
@@ -14,10 +14,12 @@ import logging
 from app.core.config import settings
 from app.core.db import get_db
 from app.core.security import get_limiter, TokenValidator, log_security_event
+from app.core.oauth import GoogleOAuthClient, GitHubOAuthClient
 from app.models.database import User, RefreshToken
 from app.models.schemas import (
     RegisterRequest,
     LoginRequest,
+    RefreshTokenRequest,
     TokenResponse,
     UserResponse,
     OAuthRequest
@@ -254,9 +256,240 @@ async def login(req: LoginRequest, request: Request, db: Session = Depends(get_d
     )
 
 
+@router.get("/oauth/authorize/github")
+async def github_authorize():
+    """Generate GitHub OAuth authorization URL."""
+    try:
+        auth_url = GitHubOAuthClient.get_authorization_url(settings.GITHUB_REDIRECT_URI)
+        return {"authorization_url": auth_url}
+    except Exception as e:
+        logger.error(f"GitHub authorization URL generation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate authorization URL"
+        )
+
+
+@router.get("/oauth/authorize/google")
+async def google_authorize():
+    """Generate Google OAuth authorization URL."""
+    try:
+        auth_url = GoogleOAuthClient.get_authorization_url(settings.GOOGLE_REDIRECT_URI)
+        return {"authorization_url": auth_url}
+    except Exception as e:
+        logger.error(f"Google authorization URL generation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate authorization URL"
+        )
+
+
+@router.post("/oauth/callback/github", response_model=TokenResponse)
+@limiter.limiter.limit(settings.RATE_LIMIT_AUTH)
+async def github_oauth_callback(
+    code: str = Query(...),
+    request: Request = None,
+    db: Session = Depends(get_db)
+):
+    """Handle GitHub OAuth callback with authorization code."""
+    try:
+        # Exchange authorization code for access token
+        token_data = await GitHubOAuthClient.get_access_token(code, settings.GITHUB_REDIRECT_URI)
+        if not token_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to exchange authorization code"
+            )
+        
+        # Get user info from GitHub
+        user_info = await GitHubOAuthClient.get_user_info(token_data.get("access_token"))
+        if not user_info:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to retrieve user information"
+            )
+        
+        email = user_info.get("email")
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Could not retrieve email from GitHub"
+            )
+        
+        # Find or create user
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            user_id = str(uuid.uuid4())
+            user = User(
+                id=user_id,
+                email=email,
+                username=user_info.get("login", email.split('@')[0]),
+                full_name=user_info.get("name"),
+                avatar_url=user_info.get("avatar_url"),
+                password_hash=hash_password(secrets.token_urlsafe(32))
+            )
+            db.add(user)
+            try:
+                db.commit()
+                db.refresh(user)
+                log_security_event(
+                    "github_oauth_signup",
+                    {"user_id": user_id, "email": email}
+                )
+            except IntegrityError:
+                db.rollback()
+                user = db.query(User).filter(User.email == email).first()
+        else:
+            # Update user info from GitHub
+            user.username = user_info.get("login", user.username)
+            user.full_name = user_info.get("name", user.full_name)
+            user.avatar_url = user_info.get("avatar_url", user.avatar_url)
+            db.commit()
+            db.refresh(user)
+            log_security_event(
+                "github_oauth_login",
+                {"user_id": user.id, "email": email}
+            )
+        
+        # Create tokens
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+        
+        # Store refresh token
+        db_refresh = RefreshToken(
+            user_id=user.id,
+            token=refresh_token,
+            expires_at=datetime.utcnow() + timedelta(days=7)
+        )
+        db.add(db_refresh)
+        db.commit()
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            user=build_user_response(user)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"GitHub OAuth callback error: {e}")
+        log_security_event(
+            "github_oauth_error",
+            {"error": str(e)},
+            severity="ERROR"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="OAuth authentication failed"
+        )
+
+
+@router.post("/oauth/callback/google", response_model=TokenResponse)
+@limiter.limiter.limit(settings.RATE_LIMIT_AUTH)
+async def google_oauth_callback(
+    code: str = Query(...),
+    request: Request = None,
+    db: Session = Depends(get_db)
+):
+    """Handle Google OAuth callback with authorization code."""
+    try:
+        # Exchange authorization code for access token
+        token_data = await GoogleOAuthClient.get_access_token(code, settings.GOOGLE_REDIRECT_URI)
+        if not token_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to exchange authorization code"
+            )
+        
+        # Get user info from Google
+        user_info = await GoogleOAuthClient.get_user_info(token_data.get("access_token"))
+        if not user_info:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed to retrieve user information"
+            )
+        
+        email = user_info.get("email")
+        if not email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Could not retrieve email from Google"
+            )
+        
+        # Find or create user
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            user_id = str(uuid.uuid4())
+            user = User(
+                id=user_id,
+                email=email,
+                username=user_info.get("name", email.split('@')[0]).replace(" ", ""),
+                full_name=user_info.get("name"),
+                avatar_url=user_info.get("picture"),
+                password_hash=hash_password(secrets.token_urlsafe(32))
+            )
+            db.add(user)
+            try:
+                db.commit()
+                db.refresh(user)
+                log_security_event(
+                    "google_oauth_signup",
+                    {"user_id": user_id, "email": email}
+                )
+            except IntegrityError:
+                db.rollback()
+                user = db.query(User).filter(User.email == email).first()
+        else:
+            # Update user info from Google
+            user.full_name = user_info.get("name", user.full_name)
+            user.avatar_url = user_info.get("picture", user.avatar_url)
+            db.commit()
+            db.refresh(user)
+            log_security_event(
+                "google_oauth_login",
+                {"user_id": user.id, "email": email}
+            )
+        
+        # Create tokens
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+        
+        # Store refresh token
+        db_refresh = RefreshToken(
+            user_id=user.id,
+            token=refresh_token,
+            expires_at=datetime.utcnow() + timedelta(days=7)
+        )
+        db.add(db_refresh)
+        db.commit()
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            user=build_user_response(user)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Google OAuth callback error: {e}")
+        log_security_event(
+            "google_oauth_error",
+            {"error": str(e)},
+            severity="ERROR"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="OAuth authentication failed"
+        )
+
+
 @router.post("/oauth/github", response_model=TokenResponse)
 async def github_oauth(req: OAuthRequest, db: Session = Depends(get_db)):
-    """GitHub OAuth callback - create or update user."""
+    """GitHub OAuth callback - create or update user. (Legacy endpoint)"""
     user = db.query(User).filter(User.email == req.email).first()
     
     if not user:
@@ -296,7 +529,7 @@ async def github_oauth(req: OAuthRequest, db: Session = Depends(get_db)):
 
 @router.post("/oauth/google", response_model=TokenResponse)
 async def google_oauth(req: OAuthRequest, db: Session = Depends(get_db)):
-    """Google OAuth callback - create or update user."""
+    """Google OAuth callback - create or update user. (Legacy endpoint)"""
     user = db.query(User).filter(User.email == req.email).first()
     
     if not user:
@@ -337,11 +570,18 @@ async def google_oauth(req: OAuthRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     token: Optional[str] = None,
-    request: Request = None,
+    authorization: Optional[str] = Header(None),
     db: Session = Depends(get_db)
 ):
     """Get current user profile with authentication enforcement."""
-    if not token:
+    # Extract token from Authorization header or query parameter
+    final_token = token
+    if not final_token and authorization:
+        # Extract from "Bearer <token>"
+        if authorization.startswith("Bearer "):
+            final_token = authorization[7:]
+    
+    if not final_token:
         log_security_event(
             "auth_failure",
             {"endpoint": "/api/auth/me", "reason": "no_token"},
@@ -354,7 +594,7 @@ async def get_current_user(
         )
     
     # Validate token using secure token validator
-    payload = TokenValidator.validate_access_token(token)
+    payload = TokenValidator.validate_access_token(final_token)
     user_id = payload.get("sub")
     
     user = db.query(User).filter(User.id == user_id).first()
@@ -368,15 +608,22 @@ async def get_current_user(
 
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=TokenResponse)
 @limiter.limiter.limit(settings.RATE_LIMIT_AUTH)  # 10/minute for auth
 async def refresh_access_token(
-    refresh_token: str,
+    req: RefreshTokenRequest,  # FIXED: proper Pydantic model instead of dict
     request: Request,
     db: Session = Depends(get_db)
 ):
     """Refresh access token using refresh token with rate limiting."""
     try:
+        refresh_token = req.refresh_token
+        if not refresh_token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="refresh_token is required"
+            )
+        
         # Use secure token validator
         payload = TokenValidator.validate_refresh_token(refresh_token)
         
@@ -395,13 +642,28 @@ async def refresh_access_token(
             )
         
         new_access_token = create_access_token(user_id)
+        new_refresh_token = create_refresh_token(user_id)
+        
+        # Store new refresh token
+        db_refresh = RefreshToken(
+            user_id=user.id,
+            token=new_refresh_token,
+            expires_at=datetime.utcnow() + timedelta(days=7)
+        )
+        db.add(db_refresh)
+        db.commit()
         
         log_security_event(
             "token_refreshed",
             {"user_id": user_id}
         )
         
-        return {"access_token": new_access_token, "token_type": "bearer"}
+        return TokenResponse(
+            access_token=new_access_token,
+            refresh_token=new_refresh_token,
+            token_type="bearer",
+            user=build_user_response(user)
+        )
         
     except HTTPException:
         raise
@@ -412,3 +674,22 @@ async def refresh_access_token(
             detail="Token refresh failed"
         )
 
+
+# ADDED: Helper function to cleanup expired refresh tokens (task #10)
+async def cleanup_expired_tokens(db: Session) -> int:
+    """
+    Delete expired refresh tokens from database.
+    Call this periodically to prevent token bloat.
+    """
+    try:
+        result = db.query(RefreshToken).filter(
+            RefreshToken.expires_at < datetime.utcnow()
+        ).delete()
+        db.commit()
+        if result > 0:
+            logger.info(f"Cleaned up {result} expired refresh tokens")
+        return result
+    except Exception as e:
+        logger.error(f"Error cleaning up expired tokens: {e}")
+        db.rollback()
+        return 0

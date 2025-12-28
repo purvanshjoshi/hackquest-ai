@@ -80,20 +80,28 @@ def calculate_difficulty_match(user_avg_exp: float, difficulty: str) -> float:
 @router.get("/matching/recommendations")
 async def get_hackathon_recommendations(
     token: Optional[str] = None,
+    authorization: Optional[str] = Header(None),
     limit: int = 10,
     db: Session = Depends(get_db)
 ):
     """Get personalized hackathon recommendations for user."""
     
+    # Extract token from Authorization header or query parameter
+    final_token = token
+    if not final_token and authorization:
+        # Extract from "Bearer <token>"
+        if authorization.startswith("Bearer "):
+            final_token = authorization[7:]
+    
     # Validate token
-    if not token:
+    if not final_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No token provided"
         )
     
     # Verify token
-    payload = verify_token_simple(token)
+    payload = verify_token_simple(final_token)
     user_id = payload.get("sub")
     
     # Get user

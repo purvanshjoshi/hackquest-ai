@@ -35,6 +35,22 @@ async def lifespan(app: FastAPI):
         # Initialize SQLite database
         init_db()
         logger.info("[OK] SQLite database initialized")
+        
+        # Clean up expired refresh tokens at startup
+        from app.core.db import get_db
+        from app.models.database import RefreshToken
+        from datetime import datetime
+        try:
+            db = next(get_db())
+            expired_count = db.query(RefreshToken).filter(
+                RefreshToken.expires_at < datetime.utcnow()
+            ).delete()
+            db.commit()
+            if expired_count > 0:
+                logger.info(f"[OK] Cleaned up {expired_count} expired refresh tokens")
+        except Exception as cleanup_err:
+            logger.warning(f"[WARN] Token cleanup failed: {cleanup_err}")
+        
     except Exception as e:
         logger.error(f"[ERROR] Startup error: {e}")
         raise
@@ -73,11 +89,27 @@ app.state.limiter = limiter.limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # 4. CORS (should be near outermost for security)
-cors_config = CORSConfig.get_cors_config()
-app.add_middleware(
-    CORSMiddleware,
-    **cors_config
-)
+if settings.DEBUG:
+    logger.info("Allowing all origins in DEBUG mode")
+    cors_config = {
+        "allow_origins": ["*"],
+        "allow_credentials": True,
+        "allow_methods": ["*"],
+        "allow_headers": ["*"],
+    }
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    cors_config = CORSConfig.get_cors_config()
+    app.add_middleware(
+        CORSMiddleware,
+        **cors_config
+    )
 
 logger.info(f"Security configuration loaded for environment: {settings.environment}")
 logger.info(f"Rate limiting: {settings.RATE_LIMIT_DEFAULT}")

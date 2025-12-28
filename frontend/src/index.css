@@ -2,6 +2,12 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+/* Import distinctive fonts - avoiding generic choices */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap');
+
 /* Reset and ensure full viewport coverage */
 html,
 body {
@@ -17,35 +23,72 @@ body {
   height: 100%;
 }
 
-/* CSS Variables for theming - Nothing OS inspired */
+/* CSS Variables for theming - Bold, distinctive palette */
 :root {
-  --background: 0 0% 0%;
+  /* Dark background with depth */
+  --background: 0 0% 2%;
   --foreground: 0 0% 100%;
-  --card: 0 0% 3.9%;
+  
+  /* Card with atmospheric effect */
+  --card: 260 30% 8%;
   --card-foreground: 0 0% 100%;
-  --primary: 210 100% 50%;
+  
+  /* Bold primary - Deep cyan/teal accent */
+  --primary: 180 100% 35%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 217 33% 17%;
+  
+  /* Secondary - Deep purple for contrast */
+  --secondary: 260 70% 40%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 217 33% 11%;
-  --muted-foreground: 215 13% 34%;
-  --accent: 210 100% 50%;
-  --accent-foreground: 0 0% 100%;
+  
+  /* Muted - Subtle grays */
+  --muted: 220 13% 20%;
+  --muted-foreground: 220 5% 50%;
+  
+  /* Sharp accent - Neon orange/amber for high-impact moments */
+  --accent: 30 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  
+  /* Destructive - Bright red */
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 217 33% 11%;
-  --input: 217 33% 11%;
-  --ring: 210 100% 50%;
+  
+  --border: 260 20% 15%;
+  --input: 260 30% 10%;
+  --ring: 180 100% 35%;
   --radius: 0.5rem;
 }
 
 @layer base {
   body {
     @apply bg-black text-white;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      "Helvetica Neue", Arial, sans-serif;
+    /* Distinctive monospace for body text - not generic system fonts */
+    font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Atmospheric background with depth */
+    background: linear-gradient(135deg, #030303 0%, #0a0515 25%, #051015 75%, #030303 100%);
+  }
+  
+  /* Use Playfair Display for headings - elegant, distinctive */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  h1 {
+    font-size: 2.8rem;
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
   }
 
   html {
@@ -69,74 +112,95 @@ body {
   }
 
   ::placeholder {
-    @apply text-gray-600;
+    @apply text-gray-500;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   code {
-    @apply bg-white/5 px-1.5 py-0.5 rounded text-sm;
+    @apply bg-cyan-500/10 px-1.5 py-0.5 rounded text-sm;
+    font-family: 'IBM Plex Mono', monospace;
+    color: #22d3ee;
   }
 
   pre code {
     @apply bg-transparent px-0 py-0;
   }
 
+  /* Bold, distinctive link styling */
   a {
-    @apply text-blue-500 hover:text-blue-400 transition-colors;
+    @apply text-cyan-400 hover:text-amber-400 transition-colors duration-300;
+    font-weight: 600;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-thickness: 2px;
   }
 }
 
-/* Custom scrollbar styling */
+/* Custom scrollbar styling - bold cyan/amber theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(30, 30, 40, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  transition: background 0.2s;
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.4) 0%, rgba(255, 193, 7, 0.3) 100%);
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(30, 30, 40, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(180deg, rgba(34, 211, 238, 0.7) 0%, rgba(255, 193, 7, 0.6) 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
 }
 
 /* Firefox scrollbar */
 * {
-  scrollbar-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.05);
+  scrollbar-color: rgba(34, 211, 238, 0.4) rgba(30, 30, 40, 0.5);
   scrollbar-width: thin;
 }
 
-/* Selection styling */
+/* Selection styling - bold accent colors */
 ::selection {
-  background-color: rgba(59, 130, 246, 0.3);
-  color: inherit;
+  background-color: rgba(34, 211, 238, 0.4);
+  color: #0a0a0a;
+  font-weight: 600;
 }
 
-/* Utility classes for shadows */
+/* Utility classes for shadows - bold, distinctive */
 .shadow-glow {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 
+              0 0 40px rgba(34, 211, 238, 0.2);
 }
 
 .shadow-glow-lg {
-  box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.6), 
+              0 0 80px rgba(34, 211, 238, 0.3);
 }
 
-/* Nothing OS Glass morphism effect */
+/* Neon accent glow - high impact */
+.shadow-accent {
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.5),
+              0 0 40px rgba(255, 193, 7, 0.25);
+}
+
+/* Glass morphism with depth */
 .glass {
-  @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.08];
-  background-color: rgba(255, 255, 255, 0.02);
+  @apply bg-white/[0.04] backdrop-blur-xl border border-cyan-500/20;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(34,211,238,0.05) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
 .glass-dark {
-  @apply bg-white/[0.01] backdrop-blur-2xl border border-white/[0.05];
-  background-color: rgba(255, 255, 255, 0.01);
+  @apply bg-black/30 backdrop-blur-2xl border border-cyan-500/10;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -158,7 +222,7 @@ body {
   opacity: 0.6;
 }
 
-/* Smooth animations */
+/* Smooth animations - high-impact moments */
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);
@@ -171,18 +235,41 @@ body {
 @keyframes glow-pulse {
   0%, 100% {
     opacity: 0.3;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
   }
   50% {
-    opacity: 0.5;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+  }
+}
+
+@keyframes glow-accent {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(255, 193, 7, 0.6);
+  }
+}
+
+/* Page load staggered reveal - high impact moment */
+@keyframes stagger-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes scale-in {
   0% {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.85);
   }
   100% {
     opacity: 1;
@@ -193,11 +280,32 @@ body {
 @keyframes slide-up {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(40px);
   }
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse with neon accent */
+@keyframes pulse-neon {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }
 
@@ -209,10 +317,29 @@ body {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
+.animate-accent-pulse {
+  animation: glow-accent 2.5s ease-in-out infinite;
+}
+
 .animate-scale-in {
-  animation: scale-in 0.3s ease-out forwards;
+  animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.4s ease-out forwards;
+  animation: slide-up 0.5s ease-out forwards;
 }
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 1.5s ease-in-out infinite;
+}
+
+/* Staggered reveals for page load */
+.stagger-1 { animation: stagger-fade-in 0.6s ease-out 0.1s forwards; opacity: 0; }
+.stagger-2 { animation: stagger-fade-in 0.6s ease-out 0.2s forwards; opacity: 0; }
+.stagger-3 { animation: stagger-fade-in 0.6s ease-out 0.3s forwards; opacity: 0; }
+.stagger-4 { animation: stagger-fade-in 0.6s ease-out 0.4s forwards; opacity: 0; }
+.stagger-5 { animation: stagger-fade-in 0.6s ease-out 0.5s forwards; opacity: 0; }

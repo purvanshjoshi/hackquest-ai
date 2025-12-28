@@ -3,6 +3,7 @@ import { Logo3D } from '../components/Logo3D';
 import { useState } from 'react';
 import { Github, Chrome } from 'lucide-react';
 import { apiClient } from '../services/api';
+import { config } from '../config';
 
 interface LoginProps {
     onLoginSuccess?: (user: { email: string; username: string; id?: string }) => void;
@@ -49,25 +50,20 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             setIsLoading(true);
             setError('');
 
-            // In production, this would redirect to GitHub OAuth
-            // For demo, we'll use a simulated GitHub login
-            const result = await apiClient.login(
-                `github_${Date.now()}@github.com`,
-                'password123'
-            );
+            // Get OAuth authorization URL from backend using config
+            const baseUrl = config.api.baseUrl;
+            const response = await fetch(`${baseUrl}/api/auth/oauth/authorize/github`);
+            const data = await response.json();
 
-            localStorage.setItem('user', JSON.stringify(result.user));
-
-            if (onLoginSuccess) {
-                onLoginSuccess({
-                    email: result.user.email,
-                    username: result.user.username,
-                    id: result.user.id
-                });
+            if (data.authorization_url) {
+                // Redirect to GitHub OAuth
+                window.location.href = data.authorization_url;
+            } else {
+                throw new Error('Failed to get authorization URL');
             }
         } catch (err) {
             console.error('GitHub login error:', err);
-            setError('GitHub login not yet configured. Use email login for now.');
+            setError('Failed to initiate GitHub login. Please try again.');
             setIsLoading(false);
         }
     };
@@ -77,25 +73,20 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             setIsLoading(true);
             setError('');
 
-            // In production, this would redirect to Google OAuth
-            // For demo, we'll use a simulated Google login
-            const result = await apiClient.login(
-                `google_${Date.now()}@google.com`,
-                'password123'
-            );
+            // Get OAuth authorization URL from backend using config
+            const baseUrl = config.api.baseUrl;
+            const response = await fetch(`${baseUrl}/api/auth/oauth/authorize/google`);
+            const data = await response.json();
 
-            localStorage.setItem('user', JSON.stringify(result.user));
-
-            if (onLoginSuccess) {
-                onLoginSuccess({
-                    email: result.user.email,
-                    username: result.user.username,
-                    id: result.user.id
-                });
+            if (data.authorization_url) {
+                // Redirect to Google OAuth
+                window.location.href = data.authorization_url;
+            } else {
+                throw new Error('Failed to get authorization URL');
             }
         } catch (err) {
             console.error('Google login error:', err);
-            setError('Google login not yet configured. Use email login for now.');
+            setError('Failed to initiate Google login. Please try again.');
             setIsLoading(false);
         }
     };

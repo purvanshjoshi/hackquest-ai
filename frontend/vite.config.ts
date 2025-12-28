@@ -13,6 +13,13 @@ export default defineConfig({
         port: 5173,
         strictPort: false,
         open: true,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+                secure: false,
+            }
+        }
     },
     build: {
         outDir: "dist",

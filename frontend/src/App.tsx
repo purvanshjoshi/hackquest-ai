@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Layout } from "@/components/Layout";
@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Matches from "./pages/Matches";
 import CodeGenerator from "./pages/CodeGenerator";
+import AuthGithubCallback from "./pages/AuthGithubCallback";
+import AuthGoogleCallback from "./pages/AuthGoogleCallback";
 
 interface User {
   id?: string;
@@ -54,40 +56,53 @@ function App() {
     setIsAuthenticated(false);
   };
 
-  // If not authenticated, just show login (no router needed)
-  if (!isAuthenticated) {
-    return (
-      <ErrorBoundary>
-        <Login onLoginSuccess={handleLoginSuccess} />
-      </ErrorBoundary>
-    );
-  }
+  // Create a separate component to handle OAuth routes
+  const AppRoutes = () => {
+    const location = useLocation();
 
-  // If authenticated, show router with all pages
+    // OAuth callback routes should be accessible even without authentication
+    if (location.pathname === '/auth/github/callback') {
+      return <AuthGithubCallback />;
+    }
+    if (location.pathname === '/auth/google/callback') {
+      return <AuthGoogleCallback />;
+    }
+
+    // If not authenticated, show login
+    if (!isAuthenticated) {
+      return <Login onLoginSuccess={handleLoginSuccess} />;
+    }
+
+    // If authenticated, show main app
+    return (
+      <div className="dark relative w-screen h-screen overflow-hidden">
+        {/* WebGL Background */}
+        <div className="fixed inset-0 z-0 pointer-events-none" style={{ width: "100vw", height: "100vh" }}>
+          <AnimatedBackground />
+        </div>
+
+        {/* Content Layer */}
+        <div className="relative z-10 w-full h-full overflow-auto bg-black/20 backdrop-blur-sm">
+          <LoadingOverlay isVisible={showLoading} />
+          <Layout user={user} onLogout={handleLogout}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/explore" element={<Home />} />
+              <Route path="/matches" element={<Matches />} />
+              <Route path="/generate" element={<CodeGenerator />} />
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </Layout>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <ErrorBoundary>
       <Router>
-        <div className="dark relative w-screen h-screen overflow-hidden">
-          {/* WebGL Background */}
-          <div className="fixed inset-0 z-0 pointer-events-none" style={{ width: "100vw", height: "100vh" }}>
-            <AnimatedBackground />
-          </div>
-
-          {/* Content Layer */}
-          <div className="relative z-10 w-full h-full overflow-auto bg-black/20 backdrop-blur-sm">
-            <LoadingOverlay isVisible={showLoading} />
-            <Layout user={user} onLogout={handleLogout}>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/explore" element={<Home />} />
-                <Route path="/matches" element={<Matches />} />
-                <Route path="/generate" element={<CodeGenerator />} />
-                <Route path="*" element={<Navigate to="/dashboard" />} />
-              </Routes>
-            </Layout>
-          </div>
-        </div>
+        <AppRoutes />
       </Router>
     </ErrorBoundary>
   );

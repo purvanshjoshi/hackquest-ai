@@ -68,6 +68,57 @@ async def analyze_user(request: AgentQueryRequest):
         )
 
 
+@router.post("/run-agent")
+async def run_agent(request: AgentQueryRequest):
+    """
+    Legacy endpoint for running agent analysis.
+    Maps to /api/agent/analyze for backward compatibility.
+    """
+    try:
+        if not request.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="user_id is required"
+            )
+        
+        # Initialize agent state
+        initial_state: AgentState = {
+            "messages": [],
+            "user_id": request.user_id,
+            "skills": request.skills or [],
+            "github_summary": request.github_summary or "",
+            "candidate_matches": [],
+            "selected_hackathon": None,
+            "win_probability": 0.0,
+            "judge_critique": "",
+            "boilerplate_code": {}
+        }
+        
+        logger.info(f"Running agent for user {request.user_id}")
+        
+        # Run the agent workflow
+        result = await app_agent.ainvoke(initial_state)
+        
+        logger.info(f"Agent completed for user {request.user_id}")
+        
+        return {
+            "status": "success",
+            "user_id": request.user_id,
+            "selected_hackathon": result.get("selected_hackathon"),
+            "win_probability": result.get("win_probability", 0.0),
+            "judge_critique": result.get("judge_critique", ""),
+            "boilerplate_code": result.get("boilerplate_code", {}),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    
+    except Exception as e:
+        logger.error(f"Agent run failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Agent run failed: {str(e)}"
+        )
+
+
 @router.get("/hackathons/{user_id}/matches")
 async def get_user_matches(
     user_id: str,

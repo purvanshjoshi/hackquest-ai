@@ -19,6 +19,22 @@ async def lifespan(app: FastAPI):
     """Application lifecycle management"""
     # Startup
     logger.info("🚀 Starting HackQuest AI Backend...")
+    
+    # Clean up expired refresh tokens at startup
+    try:
+        from app.core.db import get_db
+        from app.models.database import RefreshToken
+        from datetime import datetime
+        db = next(get_db())
+        expired_count = db.query(RefreshToken).filter(
+            RefreshToken.expires_at < datetime.utcnow()
+        ).delete()
+        db.commit()
+        if expired_count > 0:
+            logger.info(f"Cleaned up {expired_count} expired refresh tokens")
+    except Exception as cleanup_err:
+        logger.warning(f"Token cleanup skipped: {cleanup_err}")
+    
     logger.info("✅ Application started")
     
     yield

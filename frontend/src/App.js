@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useTheme } from "@/hooks";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Layout } from "@/components/Layout";
@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Matches from "./pages/Matches";
 import CodeGenerator from "./pages/CodeGenerator";
+import AuthGithubCallback from "./pages/AuthGithubCallback";
+import AuthGoogleCallback from "./pages/AuthGoogleCallback";
 function App() {
     const { mounted } = useTheme();
     const [showLoading, setShowLoading] = useState(true);
@@ -37,11 +39,23 @@ function App() {
         setUser(null);
         setIsAuthenticated(false);
     };
-    // If not authenticated, just show login (no router needed)
-    if (!isAuthenticated) {
-        return (_jsx(ErrorBoundary, { children: _jsx(Login, { onLoginSuccess: handleLoginSuccess }) }));
-    }
-    // If authenticated, show router with all pages
-    return (_jsx(ErrorBoundary, { children: _jsx(Router, { children: _jsxs("div", { className: "dark relative w-screen h-screen overflow-hidden", children: [_jsx("div", { className: "fixed inset-0 z-0 pointer-events-none", style: { width: "100vw", height: "100vh" }, children: _jsx(AnimatedBackground, {}) }), _jsxs("div", { className: "relative z-10 w-full h-full overflow-auto bg-black/20 backdrop-blur-sm", children: [_jsx(LoadingOverlay, { isVisible: showLoading }), _jsx(Layout, { user: user, onLogout: handleLogout, children: _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(Dashboard, {}) }), _jsx(Route, { path: "/dashboard", element: _jsx(Dashboard, {}) }), _jsx(Route, { path: "/explore", element: _jsx(Home, {}) }), _jsx(Route, { path: "/matches", element: _jsx(Matches, {}) }), _jsx(Route, { path: "/generate", element: _jsx(CodeGenerator, {}) }), _jsx(Route, { path: "*", element: _jsx(Navigate, { to: "/dashboard" }) })] }) })] })] }) }) }));
+    // Create a separate component to handle OAuth routes
+    const AppRoutes = () => {
+        const location = useLocation();
+        // OAuth callback routes should be accessible even without authentication
+        if (location.pathname === '/auth/github/callback') {
+            return _jsx(AuthGithubCallback, {});
+        }
+        if (location.pathname === '/auth/google/callback') {
+            return _jsx(AuthGoogleCallback, {});
+        }
+        // If not authenticated, show login
+        if (!isAuthenticated) {
+            return _jsx(Login, { onLoginSuccess: handleLoginSuccess });
+        }
+        // If authenticated, show main app
+        return (_jsxs("div", { className: "dark relative w-screen h-screen overflow-hidden", children: [_jsx("div", { className: "fixed inset-0 z-0 pointer-events-none", style: { width: "100vw", height: "100vh" }, children: _jsx(AnimatedBackground, {}) }), _jsxs("div", { className: "relative z-10 w-full h-full overflow-auto bg-black/20 backdrop-blur-sm", children: [_jsx(LoadingOverlay, { isVisible: showLoading }), _jsx(Layout, { user: user, onLogout: handleLogout, children: _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(Dashboard, {}) }), _jsx(Route, { path: "/dashboard", element: _jsx(Dashboard, {}) }), _jsx(Route, { path: "/explore", element: _jsx(Home, {}) }), _jsx(Route, { path: "/matches", element: _jsx(Matches, {}) }), _jsx(Route, { path: "/generate", element: _jsx(CodeGenerator, {}) }), _jsx(Route, { path: "*", element: _jsx(Navigate, { to: "/dashboard" }) })] }) })] })] }));
+    };
+    return (_jsx(ErrorBoundary, { children: _jsx(Router, { children: _jsx(AppRoutes, {}) }) }));
 }
 export default App;

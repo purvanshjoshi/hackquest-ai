@@ -284,7 +284,7 @@ class CORSConfig:
         
         allowed = []
         
-        # Development: allow localhost variants
+        # Development: allow localhost variants and network IPs
         if environment in ["development", "test"]:
             allowed.extend([
                 "http://localhost:3000",
@@ -293,6 +293,8 @@ class CORSConfig:
                 "http://127.0.0.1:5173",
                 "http://0.0.0.0:3000",
                 "http://0.0.0.0:5173",
+                "http://10.34.110.207:3000",
+                "http://10.34.110.207:5173",
             ])
         
         # Staging and Production: use explicit environment variables

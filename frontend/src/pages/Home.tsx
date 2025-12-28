@@ -684,7 +684,9 @@ const ActFive: React.FC<ActFiveProps> = ({ result, onAnalyzeAnother }) => {
 
             <div className="bg-black/50 border border-white/10 rounded-lg p-6 overflow-x-auto">
               <code className="text-green-400 font-mono text-sm leading-relaxed">
-                {result.boilerplate_code?.content}
+                {typeof result.boilerplate_code?.content === 'string'
+                  ? result.boilerplate_code.content
+                  : JSON.stringify(result.boilerplate_code?.content, null, 2)}
               </code>
             </div>
           </motion.div>
@@ -764,11 +766,16 @@ export default function Home() {
       const data = await response.json();
 
       if (data && data.data) {
+        // Handle boilerplate - it can be a string or an object
+        const boilerplate = typeof data.data.boilerplate === 'string'
+          ? { content: data.data.boilerplate }
+          : (data.data.boilerplate || { content: '' });
+
         setResult({
           selected_hackathon: data.data.recommendation,
           win_probability: data.data.win_probability,
           judge_critique: data.data.critique,
-          boilerplate_code: { content: data.data.boilerplate },
+          boilerplate_code: boilerplate,
         });
         setCurrentStatus('complete');
       } else {

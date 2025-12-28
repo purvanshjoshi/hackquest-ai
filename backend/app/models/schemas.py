@@ -86,6 +86,11 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class RefreshTokenRequest(BaseModel):
+    """Refresh token request - FIXED: proper schema for type validation"""
+    refresh_token: str = Field(..., min_length=1, description="Valid JWT refresh token")
+
+
 class TokenResponse(BaseModel):
     """JWT token response"""
     access_token: str

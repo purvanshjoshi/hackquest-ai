@@ -25,7 +25,7 @@ const Matches = () => {
                 filterObj.difficulty = filters.difficulty;
             if (filters.platform !== 'all')
                 filterObj.platform = filters.platform;
-            const response = await apiClient.findMatches(filterObj);
+            const response = await apiClient.findMatches([], filterObj);
             setMatches(response.data || []);
         }
         catch (err) {

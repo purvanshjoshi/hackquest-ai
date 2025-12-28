@@ -1,5 +1,5 @@
 """SQLAlchemy database models for user persistence."""
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
+from sqlalchemy import Column, String, DateTime, Boolean, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
@@ -28,7 +28,8 @@ class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(String(36), nullable=False, index=True)
-    token = Column(String(500), unique=True, nullable=False)
+    # FIXED: Added ForeignKey with CASCADE DELETE - orphaned tokens will be cleaned up
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    token = Column(String(500), nullable=False, unique=True)  # JWT token
     expires_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

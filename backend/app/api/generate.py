@@ -6,7 +6,6 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 
 from app.models.schemas import CodeGenerationRequest, CodeGenerationResponse
-from app.agents import app_agent, AgentState
 from app.core.config import settings
 from groq import Groq
 
@@ -15,6 +14,23 @@ router = APIRouter(prefix="/api/generate", tags=["generation"])
 
 # Initialize Groq client for code generation
 groq_client = Groq(api_key=settings.GROQ_API_KEY)
+
+# Lazy-loaded agent to prevent heavy startup
+_agent_cache = None
+
+
+def get_agent():
+    """Lazy-load agent only when needed."""
+    global _agent_cache
+    if _agent_cache is None:
+        try:
+            from app.agents import app_agent
+            _agent_cache = app_agent
+            logger.info("Agent loaded on-demand")
+        except Exception as e:
+            logger.error(f"Failed to load agent: {e}")
+            raise
+    return _agent_cache
 
 
 def generate_code_with_llm(prompt: str, language: str = "python", framework: Optional[str] = None) -> str:
@@ -233,16 +249,18 @@ This is a template implementation. For production use, integrate with:
 
 @router.post("/boilerplate")
 async def generate_boilerplate(
-    user_id: str,
-    problem_statement: str,
-    skills: Optional[list] = None
+    request: CodeGenerationRequest
 ):
     """Generate complete boilerplate for a hackathon."""
     try:
-        if not user_id or not problem_statement:
+        user_id = request.user_id if hasattr(request, 'user_id') else "anonymous"
+        problem_statement = request.problem_statement
+        skills = request.skills if hasattr(request, 'skills') else []
+        
+        if not problem_statement:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="user_id and problem_statement are required"
+                detail="problem_statement is required"
             )
         
         logger.info(f"Generating boilerplate for user {user_id}")
