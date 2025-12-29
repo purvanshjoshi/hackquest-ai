@@ -24,6 +24,42 @@ Hackathons represent a **$2.3B+ market opportunity** with critical friction:
 **HackQuest AI solves all 4 problems.**
 
 ---
+## 📌 Platform Snapshot
+
+| Category | Details |
+|--------|---------|
+| **Product Type** | AI-Driven Hackathon Intelligence Platform |
+| **Primary Users** | Hackathon Participants, Organizers, Judges |
+| **Core Capabilities** | Team Matching, Code Generation, Score Prediction |
+| **Architecture** | Scalable Microservice-Based System |
+| **Deployment Ready** | Dockerized · CI/CD Enabled |
+| **Current Status** | Production Ready |
+
+---
+## 🎯 Stakeholder Value Matrix
+
+| Stakeholder | Value Delivered |
+|------------|-----------------|
+| **Participants** | Faster team formation, reduced setup time, higher-quality submissions |
+| **Organizers** | Better participant engagement, improved submission standards |
+| **Judges** | Clearer project alignment, more consistent evaluation |
+| **Sponsors** | Higher innovation visibility and talent discovery |
+| **Recruiters** | Early access to high-performing teams and skilled developers |
+
+---
+
+## 🚀 Key Differentiators
+
+| Capability | HackQuest AI | Traditional Platforms |
+|-----------|-------------|-----------------------|
+| AI-Based Team Matching | ✅ Yes | ❌ No |
+| Autonomous Code Generation | ✅ Yes | ❌ No |
+| Judge Score Prediction | ✅ Yes | ❌ No |
+| Unified Hackathon Discovery | ✅ Yes | ⚠️ Limited |
+| Real-Time Collaboration | ✅ Yes | ❌ No |
+| Data-Driven Recommendations | ✅ Yes | ❌ No |
+
+---
 
 ## ✨ Solution & Impact
 
