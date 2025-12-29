@@ -74,6 +74,15 @@ Hackathons represent a **$2.3B+ market opportunity** with critical friction:
 
 ---
 
+## 🏷️ Technology & Capability Tags
+
+`AI Agents` · `Hackathon Intelligence` · `Team Matching Engine` · `Autonomous Code Generation` ·  
+`FastAPI Backend` · `React + TypeScript` · `WebSockets` · `Vector Search` ·  
+`Production-Ready` · `CI/CD Enabled` · `Dockerized` · `Scalable Architecture`
+
+---
+
+
 ## 🏗️ Architecture (Production-Grade)
 
 ```
