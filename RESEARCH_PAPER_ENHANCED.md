@@ -4,6 +4,73 @@
 
 ---
 
+## 📚 Research Documentation & References
+
+<div align="center">
+
+<table>
+<tr>
+<td width="50%" align="center" valign="top">
+
+### 🔬 **View Research Work**
+
+<a href="https://drive.google.com/file/d/1UUbrQB33Q2KNzYuh7KficsRfE8tRa6wA/view?usp=drive_link">
+  <img src="https://img.shields.io/badge/🔬_VIEW_RESEARCH_WORK-HackQuest_AI_Paper-7C3AED?style=for-the-badge&logo=googledrive&logoColor=white&labelColor=2D1B69" alt="View Research Work" height="60"/>
+</a>
+
+**Status:** ✅ In Development  
+**Format:** IEEE Conference  
+**Institution:** Graphic Era Hill University, Dehradun  
+
+**Inside This Paper:**
+- 🤖 Multi-agent system architecture
+- ⚡ Autonomous code generation (360× faster)
+- 🎯 Team matching with 87% F1-score
+- 📊 Production metrics & benchmarks
+- 🔖 Real-time hackathon discovery
+- 🚀 Scalability to 1,000+ concurrent users
+
+**Latest Update:** December 30, 2025  
+**Authors:** Purvansh Joshi · Saurabh Rawat · Kanishk Joshi · Archit Mittal
+
+</td>
+<td width="50%" align="center" valign="top">
+
+### 💡 **View The Research That Inspired Us**
+
+<a href="https://drive.google.com/file/d/1r1HDQcLpnGyoDZa1Xrs9Q9ifalqXDF-6/view?usp=drive_link">
+  <img src="https://img.shields.io/badge/📖_VIEW_INSPIRATION_PAPER-Multi--Agent_Foundation-10b981?style=for-the-badge&logo=googledrive&logoColor=white&labelColor=064e3b" alt="View Inspiration Paper" height="60"/>
+</a>
+
+**Type:** Academic Reference  
+**Focus:** Multi-Agent Systems  
+**Impact:** Methodology Foundation  
+
+**Key Learnings:**
+- 🏗️ Agent orchestration patterns
+- ⚙️ System architecture design
+- 📚 Best practices & standards
+- 🔍 Optimization strategies
+- 💡 Novel architectural approaches
+- 🎯 Production implementations
+
+**Purpose:** Foundation for our innovation  
+**Influence:** Shaping HackQuest AI design
+
+</td>
+</tr>
+</table>
+
+<p align="center">
+
+**🗣️ Connection:** The inspiration paper provided proven multi-agent patterns that directly shaped HackQuest AI's architecture, enabling us to build a production-grade system with established best practices.
+
+</p>
+
+</div>
+
+---
+
 <img width="2400" height="1600" alt="image" src="https://github.com/user-attachments/assets/308c6533-9fb6-48d4-a1af-cd3721161d7c" />
 
 ---
