@@ -13,17 +13,42 @@ Discover winning hackathons, build high-synergy teams, and generate production-r
 ---
 <div align="center">
 
+<!-- Main Research Badge -->
 <a href="./RESEARCH_PAPER_ENHANCED.md">
-  <img src="https://img.shields.io/badge/📚_RESEARCH-Click_to_View-000000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yIDNoMTZhMSAxIDAgMCAxIDEgMXYxNmExIDEgMCAwIDEtMSAxSDdhMiAyIDAgMCAxLTItMlY1YTIgMiAwIDAgMSAyLTJ6Ii8+PHBhdGggZD0iTTYgN2gxMk02IDExaDEyTTYgMTVoMTIiLz48L3N2Zz4=" height="50"/>
+  <img src="https://img.shields.io/badge/📚_VIEW_RESEARCH_PAPER-Multi--Agent_Systems_for_Innovation_Engineering-7C3AED?style=for-the-badge&logo=googlescholar&logoColor=white&labelColor=2D1B69" alt="Research Paper" height="60"/>
 </a>
 
-**📊 Key Metrics:**  
-`360× Code Gen` · `87% F1 Matching` · `99.8% Scraping` · `92% Judge Prediction` · `1000+ Concurrent Users`
+<br/><br/>
 
-**🎯 Conference Targets:**  
-IEEE ICSE 2026 · NeurIPS 2026 · ACM CHI 2026
+<!-- Metrics Row -->
+<table>
+<tr>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/360×-Faster_Code_Gen-FF6B6B?style=for-the-badge&labelColor=000000"/>
+<br/><sub>15 sec vs 90 min</sub>
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/87%25-F1_Score_Matching-4ECDC4?style=for-the-badge&labelColor=000000"/>
+<br/><sub>127+ features</sub>
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/99.8%25-Scraping_Success-FFE66D?style=for-the-badge&labelColor=000000"/>
+<br/><sub>50+ platforms</sub>
+</td>
+<td align="center" width="25%">
+<img src="https://img.shields.io/badge/92%25-Judge_Prediction-95E1D3?style=for-the-badge&labelColor=000000"/>
+<br/><sub>AUC-ROC</sub>
+</td>
+</tr>
+</table>
+
+<!-- Conference Targets -->
+<br/>
+
+[![Conference Ready](https://img.shields.io/badge/🎓_Conference_Ready-IEEE_ICSE_2026_·_NeurIPS_2026_·_ACM_CHI_2026-gold?style=for-the-badge&labelColor=1A1A1A)](./RESEARCH_PAPER_ENHANCED.md)
 
 </div>
+
 
 
 
