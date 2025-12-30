@@ -11,6 +11,20 @@
 Discover winning hackathons, build high-synergy teams, and generate production-ready code submissions in minutes—not days.
 
 ---
+<div align="center">
+
+<a href="./RESEARCH_PAPER_ENHANCED.md">
+  <img src="https://img.shields.io/badge/📚_RESEARCH-Click_to_View-000000?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yIDNoMTZhMSAxIDAgMCAxIDEgMXYxNmExIDEgMCAwIDEtMSAxSDdhMiAyIDAgMCAxLTItMlY1YTIgMiAwIDAgMSAyLTJ6Ii8+PHBhdGggZD0iTTYgN2gxMk02IDExaDEyTTYgMTVoMTIiLz48L3N2Zz4=" height="50"/>
+</a>
+
+**📊 Key Metrics:**  
+`360× Code Gen` · `87% F1 Matching` · `99.8% Scraping` · `92% Judge Prediction` · `1000+ Concurrent Users`
+
+**🎯 Conference Targets:**  
+IEEE ICSE 2026 · NeurIPS 2026 · ACM CHI 2026
+
+</div>
+
 
 
 ## 🎯 The Problem
