@@ -11,50 +11,6 @@
 Discover winning hackathons, build high-synergy teams, and generate production-ready code submissions in minutes—not days.
 
 ---
----
-
-<div align="center">
-
-## 📚 Research Publication
-
-<a href="./RESEARCH_PAPER_ENHANCED.md">
-  <img src="https://img.shields.io/badge/📖_Read_Research_Paper-4A90E2?style=for-the-badge&logoColor=white" alt="Research Paper" height="50"/>
-</a>
-
-<table>
-<tr>
-<td width="70%">
-
-### 🔬 **Multi-Agent Systems for Innovation Platform Engineering**
-
-**HackQuest AI: Agentic Intelligence for Hackathon Discovery, Team Synergy, and Autonomous Code Generation**
-
-#### Key Contributions
-- 🤖 **Multi-Agent Code Generation:** 360× faster scaffolding (15 sec vs 90 min) with 100% deterministic quality
-- 🎯 **Skill Vectorization:** 87% F1-score team matching using 127+ engineered features
-- 🌐 **Real-Time Scraping:** 99.8% success rate across 50+ heterogeneous platforms
-- 📊 **Judge Prediction:** 92% AUC-ROC accuracy with ensemble ML models
-- 🚀 **Production-Grade:** 1,000+ concurrent users, sub-500ms latency, 95% cost optimization
-
-#### Impact Metrics
-- ⚡ **1,170× faster** team formation (2.3 sec vs 45 min)
-- 🏆 **+89% team success rate** vs random matching
-- 💰 **$51-75B TAM** across innovation platforms
-- 📈 **500+ hackathons** analyzed, 50K+ submissions processed
-
-<p align="center">
-  <a href="./RESEARCH_PAPER_ENHANCED.md">
-    <img src="https://img.shields.io/badge/📄_Full_Paper-Read_Now-blue?style=for-the-badge" alt="Full Paper"/>
-  </a>
-  <a href="./PAPER_ENHANCEMENT_GUIDE.md">
-    <img src="https://img.shields.io/badge/📋_Enhancement_Guide-View-green?style=for-the-badge" alt="Guide"/>
-  </a>
-</p>
-
-</td>
-<td width="30%" align="center">
-
-
 
 
 ## 🎯 The Problem
