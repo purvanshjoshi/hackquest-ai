@@ -4,6 +4,10 @@
 
 ---
 
+<img width="2400" height="1600" alt="image" src="https://github.com/user-attachments/assets/308c6533-9fb6-48d4-a1af-cd3721161d7c" />
+
+---
+
 ## Authors and Affiliations
 
 **Purvansh Joshi¹*, Saurabh Rawat², Kanishk Joshi³, Archit Mittal⁴**
@@ -26,7 +30,6 @@ Email: work.architmittal@gmail.com | Phone: +91-8439466181
 
 
 ---
-<img width="2400" height="1600" alt="image" src="https://github.com/user-attachments/assets/308c6533-9fb6-48d4-a1af-cd3721161d7c" />
 
 
 ## Abstract
