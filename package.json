@@ -2,7 +2,7 @@
   "homepage": "https://hackquest-ai.me",
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist",
     "build": "vite build",
     "start": "vite"
   },
