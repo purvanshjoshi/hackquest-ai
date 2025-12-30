@@ -7,32 +7,35 @@ A professional, production-ready React + TypeScript application for AI-powered h
 ```
 src/
 ├── components/
-│   ├── ui/                    # Reusable UI components (shadcn/ui style)
-│   │   ├── Card.tsx
-│   │   ├── Button.tsx
-│   │   ├── Badge.tsx
-│   │   ├── Input.tsx
-│   │   └── Skeleton.tsx
-│   ├── SkillTag.tsx          # Domain-specific components
-│   ├── Layout.tsx             # Main layout with nav & footer
-│   └── ErrorBoundary.tsx      # Error handling
+│   ├── ui/                 # Design-system primitives (shadcn-inspired)
+│   ├── SkillTag.tsx        # Domain-specific UI
+│   ├── Layout.tsx          # App shell (nav, footer, theme)
+│   └── ErrorBoundary.tsx   # Global error handling
+│
 ├── pages/
-│   └── Home.tsx               # Landing page
+│   └── Home.tsx            # Landing / dashboard entry
+│
 ├── hooks/
-│   ├── useTheme.ts           # Dark/light theme management
-│   └── useWebSocket.ts       # WebSocket connection hook
+│   ├── useTheme.ts         # Dark/light mode orchestration
+│   └── useWebSocket.ts    # Resilient WS connection manager
+│
 ├── services/
-│   └── agentService.ts       # Agent API communication
+│   └── agentService.ts    # AI agent communication layer
+│
 ├── lib/
-│   ├── utils.ts              # Utility functions
-│   └── constants.ts          # App-wide constants
+│   ├── utils.ts           # Shared helpers
+│   └── constants.ts       # Centralized constants
+│
 ├── config/
-│   └── index.ts              # Environment configuration
+│   └── index.ts           # Environment & feature config
+│
 ├── types/
-│   └── index.ts              # TypeScript interfaces
-├── App.tsx                    # Root component
-├── main.tsx                   # Entry point
-└── index.css                  # Global styles
+│   └── index.ts           # Global TypeScript contracts
+│
+├── App.tsx                # Root component
+├── main.tsx               # Vite entry point
+└── index.css              # Global + Tailwind styles
+
 ```
 
 ## 🚀 Getting Started
