@@ -19,10 +19,9 @@
 </a>
 
 **Status:** ✅ In Development  
-**Format:** IEEE Conference  
 **Institution:** Graphic Era Hill University, Dehradun  
 
-**Inside This Paper:**
+**Inside the research documentation:**
 - 🤖 Multi-agent system architecture
 - ⚡ Autonomous code generation (360× faster)
 - 🎯 Team matching with 87% F1-score
