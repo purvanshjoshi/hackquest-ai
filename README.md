@@ -15,7 +15,7 @@ Discover winning hackathons, build high-synergy teams, and generate production-r
 
 <!-- Main Research Badge -->
 <a href="./RESEARCH_PAPER_ENHANCED.md">
-  <img src="https://img.shields.io/badge/📚_VIEW_RESEARCH_PAPER-Multi--Agent_Systems_for_Innovation_Engineering-7C3AED?style=for-the-badge&logo=googlescholar&logoColor=white&labelColor=2D1B69" alt="Research Paper" height="60"/>
+  <img src="https://img.shields.io/badge/📚_VIEW_RESEARCH_WORK-Multi--Agent_Systems_for_Innovation_Engineering-7C3AED?style=for-the-badge&logo=googlescholar&logoColor=white&labelColor=2D1B69" alt="Research Paper" height="60"/>
 </a>
 
 <br/><br/>
@@ -44,8 +44,6 @@ Discover winning hackathons, build high-synergy teams, and generate production-r
 
 <!-- Conference Targets -->
 <br/>
-
-[![Conference Ready](https://img.shields.io/badge/🎓_Conference_Ready-IEEE_ICSE_2026_·_NeurIPS_2026_·_ACM_CHI_2026-gold?style=for-the-badge&labelColor=1A1A1A)](./RESEARCH_PAPER_ENHANCED.md)
 
 </div>
 
