@@ -47,7 +47,6 @@ Discover winning hackathons, build high-synergy teams, and generate production-r
 
 </div>
 
-website domain- hackquest-ai.me
 
 
 ## 🎯 The Problem
