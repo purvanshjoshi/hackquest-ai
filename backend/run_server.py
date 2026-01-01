@@ -9,6 +9,6 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # Run uvicorn
 subprocess.run(
-    [sys.executable, "-m", "uvicorn", "app.main_lite:app", "--host", "127.0.0.1", "--port", "8000"],
+    [sys.executable, "-m", "uvicorn", "app.main_lite:app", "--host", "0.0.0.0" "--port", "8000"],
     cwd=os.path.dirname(os.path.abspath(__file__))
 )
