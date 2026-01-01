@@ -24,11 +24,6 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.1.1
 PyJWT==2.10.1
 
-# AI/ML & Agentic Frameworks
-langchain==0.1.0
-langchain-community==0.0.38
-langchain-groq==0.0.1
-
 # API & HTTP
 httpx==0.25.1
 requests==2.32.4
