@@ -15,8 +15,8 @@ redis==5.0.1
 pinecone==8.0.0
 
 # ORM & Validation
-pydantic==2.1.0
-pydantic-settings==2.1.0
+pydantic==2.5.0
+pydantic-settings==2.0.1
 
 # Authentication & Security
 python-jose[cryptography]==3.4.0
@@ -24,10 +24,10 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.1.1
 PyJWT==2.10.1
 
-# AI/ML & Agentic Frameworks
+# AI/ML & Agentic Frameworks  
 langgraph==0.0.9
-langchain==0.3.0
-langchain-community==0.3.27
+langchain==0.1.0
+langchain-community==0.1.0
 langchain-groq==0.0.1
 
 # API & HTTP
