@@ -14,6 +14,9 @@ pymongo==4.7.0
 redis==5.0.1
 pinecone==8.0.0
 
+# SSL/TLS Certificate Management
+certifi>=2024.1.1
+
 # ORM & Validation
 pydantic==2.8.2
 pydantic-settings==2.1.0

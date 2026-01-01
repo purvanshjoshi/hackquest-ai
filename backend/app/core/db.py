@@ -1,6 +1,8 @@
 """Database connection management with error handling"""
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 import logging
+import ssl
+import certifi
 
 logger = logging.getLogger(__name__)
 
@@ -31,23 +33,41 @@ async def connect_to_db():
         logger.info(f"   URL format: {('Atlas SRV' if 'mongodb+srv' in settings.MONGODB_URL else 'Standard MongoDB')}")
         logger.info(f"   Database: {settings.DATABASE_NAME}")
         
-        # For Atlas SRV connections, Motor automatically handles:
-        # - TLS/SSL (mongodb+srv includes ?tls=true by default)
+        # Configure TLS/SSL for MongoDB Atlas
+        # Python 3.13 requires explicit SSL context configuration
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        ssl_context.check_hostname = True
+        ssl_context.verify_mode = ssl.CERT_REQUIRED
+        
+        # For Motor/PyMongo with SRV connections, pass tlsCertificateKeyFile if needed
+        connection_kwargs = {
+            "serverSelectionTimeoutMS": 10000,
+            "connectTimeoutMS": 10000,
+            "socketTimeoutMS": 5000,
+            "retryWrites": True,
+        }
+        
+        # For MongoDB Atlas SRV URIs, ensure TLS is enabled
+        if 'mongodb+srv' in settings.MONGODB_URL:
+            connection_kwargs["tls"] = True
+            connection_kwargs["tlsCAFile"] = certifi.where()
+            logger.info(f"   TLS enabled with CA bundle from certifi")
+        
+        # Motor automatically handles:
+        # - TLS/SSL (mongodb+srv includes TLS by default)
         # - Replica set discovery
         # - Connection pooling
         client = AsyncIOMotorClient(
             settings.MONGODB_URL,
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=10000,
-            socketTimeoutMS=5000,
+            **connection_kwargs
         )
-        db = client[settings.DATABASE_NAME]
         
         # Test the connection with a ping
-        await db.command("ping")
+        await client.admin.command("ping")
+        db = client[settings.DATABASE_NAME]
         
         logger.info("✅ MongoDB connection successful")
-        logger.info(f"   Server info available on next operation")
+        logger.info(f"   Database: {settings.DATABASE_NAME}")
         
     except Exception as e:
         logger.error(f"❌ MongoDB connection failed: {type(e).__name__}: {str(e)}")
