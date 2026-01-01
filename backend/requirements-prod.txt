@@ -14,8 +14,8 @@ pymongo==4.7.0
 redis==5.0.1
 pinecone==8.0.0
 
-# ORM & Validation - Using v1 for Python 3.8 compatibility
-pydantic~=1.10.12
+# ORM & Validation
+pydantic==2.1.0
 pydantic-settings==2.1.0
 
 # Authentication & Security
