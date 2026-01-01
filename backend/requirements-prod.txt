@@ -13,7 +13,7 @@ redis==5.0.1
 pinecone==8.0.0
 
 # ORM & Validation
-pydantic==2.5.0
+pydantic==2.7.0
 pydantic-settings==2.1.0
 
 # Authentication & Security
