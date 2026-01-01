@@ -26,8 +26,8 @@ PyJWT==2.10.1
 
 # AI/ML & Agentic Frameworks
 langgraph==0.0.9
-langchain==0.2.4
-langchain-community==0.2.4
+langchain==0.1.0
+langchain-community==0.1.0
 langchain-groq==0.0.1
 
 # API & HTTP
