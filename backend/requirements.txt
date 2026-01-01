@@ -28,7 +28,7 @@ langchain==0.3.0
 langchain-community==0.3.27
 langchain-groq==0.0.1
 sentence-transformers==2.2.2
-numpy==1.24.3
+numpy=1.26.4
 
 # API & HTTP
 httpx==0.25.1
