@@ -3,15 +3,15 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 import jwt
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status
 from passlib.context import CryptContext
 from app.models.schemas import (
     RegisterRequest, LoginRequest, TokenResponse, UserResponse
 )
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.db import get_db
 from bson.objectid import ObjectId
-from motor.motor_asyncio import AsyncDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -62,10 +62,11 @@ def verify_token(token: str) -> str:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-async def get_current_user(token: str, db: AsyncDatabase = Depends(get_db)):
+async def get_current_user(token: str):
     """Get current authenticated user"""
     try:
         user_id = verify_token(token)
+        db = await get_db()
         users = db["users"]
         user = await users.find_one({"_id": ObjectId(user_id)})
         if not user:
@@ -76,9 +77,10 @@ async def get_current_user(token: str, db: AsyncDatabase = Depends(get_db)):
 
 
 @router.post("/register", response_model=TokenResponse)
-async def register(req: RegisterRequest, db: AsyncDatabase = Depends(get_db)):
+async def register(req: RegisterRequest):
     """Register new user"""
     try:
+        db = await get_db()
         users = db["users"]
         
         # Check if user exists
@@ -134,9 +136,10 @@ async def register(req: RegisterRequest, db: AsyncDatabase = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(req: LoginRequest, db: AsyncDatabase = Depends(get_db)):
+async def login(req: LoginRequest):
     """Login user"""
     try:
+        db = await get_db()
         users = db["users"]
         
         # Find user by email
@@ -180,9 +183,10 @@ async def login(req: LoginRequest, db: AsyncDatabase = Depends(get_db)):
 
 
 @router.post("/oauth/github", response_model=TokenResponse)
-async def github_oauth(code: str, db: AsyncDatabase = Depends(get_db)):
+async def github_oauth(code: str):
     """GitHub OAuth login"""
     try:
+        db = await get_db()
         # TODO: Exchange code for GitHub access token
         # TODO: Get user info from GitHub API
         # For now, create/update user with GitHub info
@@ -248,9 +252,10 @@ async def github_oauth(code: str, db: AsyncDatabase = Depends(get_db)):
 
 
 @router.post("/oauth/google", response_model=TokenResponse)
-async def google_oauth(id_token: str, db: AsyncDatabase = Depends(get_db)):
+async def google_oauth(id_token: str):
     """Google OAuth login"""
     try:
+        db = await get_db()
         # TODO: Verify ID token with Google
         # TODO: Get user info from ID token
         
@@ -309,10 +314,11 @@ async def google_oauth(id_token: str, db: AsyncDatabase = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(token: str, db: AsyncDatabase = Depends(get_db)):
+async def get_me(token: str):
     """Get current user info"""
     try:
         user_id = verify_token(token)
+        db = await get_db()
         users = db["users"]
         user = await users.find_one({"_id": ObjectId(user_id)})
         
