@@ -97,17 +97,22 @@ logger.info("✅ FastAPI app instance created")
 # ADD MIDDLEWARE
 # ============================================================================
 
-# CORS Middleware - TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
+# CORS Middleware - Secure production configuration
+origins = [
+    "https://hackquest-ai.me",
+    "https://www.hackquest-ai.me",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     max_age=3600
 )
 
-logger.info("✅ CORS middleware configured (DEBUG MODE: allow_origins=['*'])")
+logger.info(f"✅ CORS middleware configured for origins: {origins}")
 
 # ============================================================================
 # ENDPOINTS: ROOT & HEALTH CHECK

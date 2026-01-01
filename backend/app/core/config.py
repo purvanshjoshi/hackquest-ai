@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables with sensible defaults"""
     
     # ==================== DATABASE CONFIGURATION ====================
+    # MongoDB Atlas: mongodb+srv://user:pass@cluster.mongodb.net/?retryWrites=true&w=majority&tls=true
+    # Local dev: mongodb://localhost:27017
     MONGODB_URL: str = "mongodb://localhost:27017"
     DATABASE_NAME: str = "hackquest"
     MONGODB_DB: str = "hackquest"  # Keep for backwards compatibility
@@ -48,4 +50,5 @@ def get_settings() -> Settings:
 
 # Initialize settings at module load time
 settings = get_settings()
-logger.info("✅ Settings loaded successfully")
+logger.info(f"✅ Settings loaded | Environment: {settings.ENVIRONMENT} | Debug: {settings.DEBUG}")
+logger.info(f"✅ MongoDB connection string format: {('mongodb+srv' if 'mongodb+srv' in settings.MONGODB_URL else 'mongodb')}://")
