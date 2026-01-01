@@ -15,8 +15,8 @@ redis==5.0.1
 pinecone==8.0.0
 
 # ORM & Validation
-pydantic==2.5.0
-pydantic-settings==2.0.1
+pydantic==2.8.2
+pydantic-settings==2.1.0
 
 # Authentication & Security
 python-jose[cryptography]==3.4.0
