@@ -1,5 +1,5 @@
 # FastAPI & Web Server
-fastapi==0.104.1
+fastapi==0.109.0
 uvicorn[standard]==0.24.0
 python-multipart==0.0.18
 python-dotenv==1.0.0
