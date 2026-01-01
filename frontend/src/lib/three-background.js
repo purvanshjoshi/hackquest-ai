@@ -25,7 +25,7 @@ export const createBackgroundScene = (container) => {
         renderer.domElement.style.height = "100%";
         renderer.domElement.style.zIndex = "0";
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFShadowMap;
+        renderer.shadowMap.type = THREE.PCFShadowShadowMap;
         console.log("Appending renderer to container...");
         const canvas = renderer.domElement;
         canvas.style.position = "absolute";
@@ -91,7 +91,7 @@ export const createBackgroundScene = (container) => {
                 linePositions[j * 3] = (t - 0.5) * 300;
                 linePositions[j * 3 + 1] =
                     Math.sin(t * Math.PI * 4 + i) * 60 +
-                    Math.cos(t * Math.PI * 2 + i) * 40;
+                        Math.cos(t * Math.PI * 2 + i) * 40;
                 linePositions[j * 3 + 2] =
                     Math.cos(t * Math.PI * 3 + i) * 60;
             }

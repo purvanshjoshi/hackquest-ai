@@ -20,7 +20,7 @@ export default function Login({ onLoginSuccess }) {
         setIsLoading(true);
         try {
             const result = await apiClient.login(email, password);
-            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('user', JSON.stringify({ loggedIn: true }));
             if (onLoginSuccess) {
                 onLoginSuccess({
                     email: result.user.email,
