@@ -5,6 +5,7 @@ python-multipart==0.0.18
 python-dotenv==1.0.0
 slowapi==0.1.9
 setuptools>=65.5.0
+wheel
 
 # Database Drivers
 motor==3.3.1
@@ -27,7 +28,6 @@ langgraph==0.0.9
 langchain==0.3.0
 langchain-community==0.3.27
 langchain-groq==0.0.1
-numpy==1.24.3
 
 # API & HTTP
 httpx==0.25.1
@@ -36,7 +36,6 @@ requests==2.32.4
 # Data & Scraping
 beautifulsoup4==4.12.2
 lxml==4.9.4
-selenium==4.15.2
 
 # GitHub Integration
 PyGithub==2.1.1
