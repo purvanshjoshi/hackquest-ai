@@ -50,6 +50,7 @@ Discover winning hackathons, build high-synergy teams, and generate production-r
 
 
 ## 🎯 The Problem
+## THEME :: OPEN INNOVATION 
 
 Hackathons represent a **$2.3B+ market opportunity** with critical friction:
 
