@@ -30,7 +30,7 @@ requests==2.32.4
 
 # Data & Scraping
 beautifulsoup4==4.12.2
-lxml==4.9.4
+lxml==5.1.0
 
 # GitHub Integration
 PyGithub==2.1.1
