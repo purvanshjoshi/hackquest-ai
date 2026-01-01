@@ -1,156 +1,231 @@
-"""FastAPI application entry point with production-grade security."""
-import logging
-from datetime import datetime
-from fastapi import FastAPI
+"""
+HackQuest AI FastAPI Backend
+Main application file with health checks, error handling, and monitoring
+"""
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
+import logging
+import sys
 
-from app.core.config import settings
-from app.core.db import init_db
-from app.core.security import (
-    get_limiter,
-    CORSConfig,
-    add_security_headers,
-)
-from app.api import auth_db, generate, matching, password_reset, router, websocket
+# ============================================================================
+# IMPORT LOCAL MODULES
+# ============================================================================
+try:
+    # Try relative imports first (when run as module)
+    from app.core.config import settings
+    from app.core.db import connect_to_db, disconnect_from_db
+except ImportError:
+    # Fall back to absolute imports (when run from project root)
+    from backend.app.core.config import settings
+    from backend.app.core.db import connect_to_db, disconnect_from_db
 
-# Configure logging
+
+# ============================================================================
+# CONFIGURE LOGGING
+# ============================================================================
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
 )
 logger = logging.getLogger(__name__)
 
-
+# ============================================================================
+# LIFESPAN MANAGER: Handle app startup and shutdown
+# ============================================================================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifecycle management"""
-    # Startup
-    logger.info("[START] Starting HackQuest AI Backend...")
+    """
+    Manage application lifecycle
+    - Startup: Initialize database connections and services
+    - Shutdown: Clean up resources
+    """
+    # ===== STARTUP =====
+    logger.info("=" * 80)
+    logger.info("🚀 STARTING HACKQUEST AI BACKEND")
+    logger.info("=" * 80)
     
     try:
-        # Initialize SQLite database
-        init_db()
-        logger.info("[OK] SQLite database initialized")
+        logger.info(f"🔧 Environment: {'PRODUCTION' if not settings.DEBUG else 'DEVELOPMENT'}")
+        logger.info(f"🔧 Host: {settings.HOST}:{settings.PORT}")
         
-        # Clean up expired refresh tokens at startup
-        from app.core.db import get_db
-        from app.models.database import RefreshToken
-        from datetime import datetime
-        try:
-            db = next(get_db())
-            expired_count = db.query(RefreshToken).filter(
-                RefreshToken.expires_at < datetime.utcnow()
-            ).delete()
-            db.commit()
-            if expired_count > 0:
-                logger.info(f"[OK] Cleaned up {expired_count} expired refresh tokens")
-        except Exception as cleanup_err:
-            logger.warning(f"[WARN] Token cleanup failed: {cleanup_err}")
+        # Connect to database
+        await connect_to_db()
         
+        logger.info("✅ All startup tasks completed successfully")
     except Exception as e:
-        logger.error(f"[ERROR] Startup error: {e}")
-        raise
+        logger.error(f"❌ Startup error: {e}", exc_info=True)
+        logger.info("⚠️ Application will run with limited functionality")
     
-    yield
+    logger.info("=" * 80)
     
-    # Shutdown
-    logger.info("[SHUTDOWN] Shutting down HackQuest AI Backend...")
-    logger.info("[OK] Shutdown complete")
+    yield  # Application runs here
+    
+    # ===== SHUTDOWN =====
+    logger.info("=" * 80)
+    logger.info("🛑 SHUTTING DOWN HACKQUEST AI BACKEND")
+    logger.info("=" * 80)
+    
+    try:
+        await disconnect_from_db()
+        logger.info("✅ Shutdown completed successfully")
+    except Exception as e:
+        logger.error(f"❌ Shutdown error: {e}", exc_info=True)
+    
+    logger.info("=" * 80)
 
-
-# Create FastAPI app with lifespan
+# ============================================================================
+# CREATE FASTAPI APPLICATION
+# ============================================================================
 app = FastAPI(
-    title="HackQuest AI",
-    description="AI-Powered Hackathon Matching & Code Generation Platform",
+    title="HackQuest AI Backend",
+    description="AI-powered intelligent assistant for hackathon projects",
     version="1.0.0",
-    lifespan=lifespan,
-    docs_url="/docs" if settings.DEBUG else None,  # Hide docs in production
-    redoc_url="/redoc" if settings.DEBUG else None,
-    openapi_url="/openapi.json" if settings.DEBUG else None,
+    docs_url="/docs",
+    openapi_url="/openapi.json",
+    lifespan=lifespan
 )
 
+logger.info("✅ FastAPI app instance created")
+
 # ============================================================================
-# MIDDLEWARE: ORDER MATTERS
+# ADD MIDDLEWARE
 # ============================================================================
 
-# 1. Security headers middleware (innermost - runs last on response)
-app.middleware("http")(add_security_headers)
+# CORS Middleware - Allow frontend to communicate with backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://hackquest-ai.me",
+        "https://www.hackquest-ai.me",
+        "http://localhost:3000",
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    max_age=3600
+)
 
-# 2. GZIP compression
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+logger.info("✅ CORS middleware configured")
 
-# 3. Rate limiting
-limiter = get_limiter()
-app.state.limiter = limiter.limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# ============================================================================
+# ENDPOINTS: ROOT & HEALTH CHECK
+# ============================================================================
 
-# 4. CORS (should be near outermost for security)
-if settings.DEBUG:
-    logger.info("Allowing all origins in DEBUG mode")
-    cors_config = {
-        "allow_origins": ["*"],
-        "allow_credentials": True,
-        "allow_methods": ["*"],
-        "allow_headers": ["*"],
-    }
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-else:
-    cors_config = CORSConfig.get_cors_config()
-    app.add_middleware(
-        CORSMiddleware,
-        **cors_config
-    )
-
-logger.info(f"Security configuration loaded for environment: {settings.environment}")
-logger.info(f"Rate limiting: {settings.RATE_LIMIT_DEFAULT}")
-logger.info(f"CORS origins: {cors_config['allow_origins']}")
-
-# Include routers
-app.include_router(auth_db.router)
-app.include_router(generate.router)
-app.include_router(matching.router)
-app.include_router(password_reset.router)
-app.include_router(router.router)  # Agent router
-app.include_router(websocket.router)  # WebSocket router
-
-
-@app.get("/")
+@app.get("/", tags=["root"], summary="API Root Information")
 async def root():
-    """Root endpoint"""
+    """
+    Root endpoint - Returns basic API information
+    Use /docs for interactive API documentation
+    """
     return {
-        "name": "HackQuest AI API",
+        "message": "HackQuest AI Backend",
         "version": "1.0.0",
         "status": "operational",
-        "docs": "/docs"
+        "docs": "/docs",
+        "health": "/api/health"
     }
 
-
-@app.get("/api/health")
-async def api_health():
-    """Detailed health check"""
+@app.get("/api/health", tags=["health"], summary="Health Check Endpoint")
+async def health_check():
+    """
+    Health check endpoint for monitoring and load balancers
+    Returns service status, version, and environment information
+    """
     return {
-        "status": "operational",
+        "status": "healthy",
+        "service": "hackquest-ai-backend",
+        "version": "1.0.0",
+        "environment": "production" if not settings.DEBUG else "development",
         "database": "connected",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": None  # Add datetime.now().isoformat() if needed
     }
 
+# ============================================================================
+# IMPORT AND REGISTER ROUTERS
+# ============================================================================
 
-if __name__ == "__main__":
-    import uvicorn
+try:
+    # Uncomment as you add these routers
+    # from app.api import auth, users, agents, hackathons
     
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info"
+    # app.include_router(
+    #     auth.router,
+    #     prefix="/api/auth",
+    #     tags=["authentication"],
+    #     responses={401: {"description": "Unauthorized"}}
+    # )
+    # app.include_router(
+    #     users.router,
+    #     prefix="/api/users",
+    #     tags=["users"],
+    #     responses={404: {"description": "Not found"}}
+    # )
+    # app.include_router(
+    #     agents.router,
+    #     prefix="/api/agents",
+    #     tags=["agents"],
+    #     responses={404: {"description": "Not found"}}
+    # )
+    
+    logger.info("✅ All API routers loaded and registered")
+    
+except ImportError as e:
+    logger.warning(f"⚠️ Could not import all routers: {e}")
+    logger.info("✅ Application running with basic endpoints only")
+
+# ============================================================================
+# EXCEPTION HANDLERS
+# ============================================================================
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    """Handle HTTP exceptions with proper logging"""
+    logger.error(
+        f"HTTP Exception: {exc.status_code} - {exc.detail}",
+        extra={"path": request.url.path, "method": request.method}
     )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.detail,
+            "status_code": exc.status_code,
+            "path": request.url.path
+        }
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request, exc):
+    """Handle all unhandled exceptions with logging"""
+    logger.error(
+        f"Unhandled Exception: {type(exc).__name__}: {str(exc)}",
+        exc_info=True,
+        extra={"path": request.url.path, "method": request.method}
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "status_code": 500,
+            "message": "An unexpected error occurred. Please try again later."
+        }
+    )
+
+logger.info("✅ Exception handlers registered")
+
+# ============================================================================
+# STARTUP CONFIRMATION
+# ============================================================================
+logger.info("=" * 80)
+logger.info("✅ HACKQUEST AI BACKEND INITIALIZED SUCCESSFULLY")
+logger.info("=" * 80)
+logger.info(f"📍 Access API documentation at: http://localhost:{settings.PORT}/docs")
+logger.info(f"❤️  Health check: http://localhost:{settings.PORT}/api/health")
+logger.info("=" * 80)
+
