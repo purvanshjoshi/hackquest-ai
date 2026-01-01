@@ -13,7 +13,7 @@ redis==5.0.1
 pinecone==8.0.0
 
 # ORM & Validation
-pydantic==2.0.3
+pydantic==2.5.0
 pydantic-settings==2.1.0
 
 # Authentication & Security
@@ -27,11 +27,16 @@ langgraph==0.0.9
 langchain==0.3.0
 langchain-community==0.3.27
 langchain-groq==0.0.1
-sentence-transformers==2.1.2
-numpy==2.0.0
+numpy==1.24.3
+
 # API & HTTP
 httpx==0.25.1
 requests==2.32.4
+
+# Data & Scraping
+beautifulsoup4==4.12.2
+lxml==4.9.4
+selenium==4.15.2
 
 # GitHub Integration
 PyGithub==2.1.1
