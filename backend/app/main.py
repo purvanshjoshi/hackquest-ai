@@ -101,6 +101,8 @@ logger.info("✅ FastAPI app instance created")
 origins = [
     "https://hackquest-ai.me",
     "https://www.hackquest-ai.me",
+        "https://hackquest-ai-1.onrender.com",
+        "http://localhost:5173",
 ]
 
 app.add_middleware(
