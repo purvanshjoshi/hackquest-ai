@@ -157,24 +157,24 @@ try:
     # Uncomment as you add these routers
     # from app.api import auth, users, agents, hackathons
     
-    # app.include_router(
-    #     auth.router,
-    #     prefix="/api/auth",
-    #     tags=["authentication"],
-    #     responses={401: {"description": "Unauthorized"}}
-    # )
-    # app.include_router(
-    #     users.router,
-    #     prefix="/api/users",
-    #     tags=["users"],
-    #     responses={404: {"description": "Not found"}}
-    # )
-    # app.include_router(
-    #     agents.router,
-    #     prefix="/api/agents",
-    #     tags=["agents"],
-    #     responses={404: {"description": "Not found"}}
-    # )
+    app.include_router(
+         auth.router,
+         prefix="/api/auth",
+         tags=["authentication"],
+         responses={401: {"description": "Unauthorized"}}
+     )
+    app.include_router(
+         users.router,
+         prefix="/api/users",
+         tags=["users"],
+         responses={404: {"description": "Not found"}}
+     )
+    app.include_router(
+         agents.router,
+         prefix="/api/agents",
+         tags=["agents"],
+         responses={404: {"description": "Not found"}}
+     )
     
     logger.info("✅ All API routers loaded and registered")
     
