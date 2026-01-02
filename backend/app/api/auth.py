@@ -343,37 +343,6 @@ async def get_me(token: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve user"
         )
-async def login(req: LoginRequest):
-    """Login user"""
-    try:
-        # Find user
-        user = await Collections.users().find_one({"email": req.email})
-        if not user or not verify_password(req.password, user.get("password_hash", "")):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid credentials"
-            )
-        
-        # Generate tokens
-        user_id = str(user["_id"])
-        access_token = create_access_token(user_id)
-        refresh_token = create_access_token(user_id, expires_delta=timedelta(days=7))
-        
-        logger.info(f"User logged in: {req.email}")
-        
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=86400
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Login error: {e}")
-        raise HTTPException(status_code=500, detail="Login failed")
-
-
 @router.post("/verify")
 async def verify(token: str):
     """Verify token validity"""
