@@ -155,7 +155,7 @@ async def health_check():
 
 try:
     # Uncomment as you add these routers
-    # from app.api import auth, users, agents, hackathons
+    from app.api import auth, users, agents, hackathons
     
     app.include_router(
          auth.router,
