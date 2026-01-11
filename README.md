@@ -642,7 +642,7 @@ Built for hackathon enthusiasts by a hackathon enthusiast. 🚀
 ## 👋 Credits
 
 **Creator**: [Purvansh Joshi](https://github.com/purvanshjoshi) [Archit Mittal](https://github.com/archittmittal)
-
+[Saurabh Rawat](https://github.com/saurabhrawatgthb)
 **Status**: Active Development (December 2025)  
 **Built With**: React • FastAPI • PostgreSQL • LangChain • OpenAI  
 
