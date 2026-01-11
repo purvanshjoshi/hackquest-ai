@@ -641,7 +641,8 @@ Built for hackathon enthusiasts by a hackathon enthusiast. 🚀
 
 ## 👋 Credits
 
-**Creator**: [Purvansh Joshi](https://github.com/purvanshjoshi)  
+**Creator**: [Purvansh Joshi](https://github.com/purvanshjoshi) [Archit Mittal](https://github.com/archittmittal)
+
 **Status**: Active Development (December 2025)  
 **Built With**: React • FastAPI • PostgreSQL • LangChain • OpenAI  
 
@@ -649,12 +650,18 @@ Built for hackathon enthusiasts by a hackathon enthusiast. 🚀
 
 ---
 
-## 🚀 Let's Connect
+## 🚀 Let's Connect (Purvansh Joshi)
 
 - 🐦 [Twitter](https://twitter.com/purvanshjoshi)
 - 💼 [LinkedIn](https://linkedin.com/in/purvanshjoshi)
 - 🔗 [Portfolio](https://purvanshjoshi.dev)
 - 📧 [Email](mailto:hello@purvanshjoshi.dev)
+
+## 🚀 Let's Connect (Archit Mittal)
+
+- 💼 [LinkedIn](https://www.linkedin.com/in/archit-mittal-010638305/)
+- 🔗 [Portfolio](https://archittmittal.github.io/Portfolio/)
+- 📧 [Email](mailto:work.architmittal@gmail.com)
 
 **Have questions?** [Open an issue](https://github.com/purvanshjoshi/hackquest-ai/issues) or start a [discussion](https://github.com/purvanshjoshi/hackquest-ai/discussions).
 
