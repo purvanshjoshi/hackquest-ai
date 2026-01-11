@@ -6,6 +6,12 @@
 [![Python](https://img.shields.io/badge/Python-3.11-3776ab?style=flat-square&logo=python)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
+
+## 📹 Demo
+
+[![Watch the Demo](https://img.shields.io/badge/Demo-Google%20Drive-blue?style=for-the-badge)](https://drive.google.com/file/d/1_f3fpNyxs4Vcf-hRc1HvuqaFvZU64eA4/view?usp=sharing)
+
+Check out our [interactive demo video](https://drive.google.com/file/d/1_f3fpNyxs4Vcf-hRc1HvuqaFvZU64eA4/view?usp=sharing) to see HackQuest AI in action—discover winning hackathons, build high-synergy teams, and generate production-ready submissions.
 > 🧩 **Team Contributions & Git Workflow Note**  
 >  
 > During the final sprint, a lot of code was assembled on a single machine and pushed from one GitHub account so that we could ship a stable, end‑to‑end demo instead of fighting merge conflicts at 3 AM.  
