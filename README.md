@@ -1,26 +1,34 @@
 # HackQuest AI 🧠⚡
 
-> 🧩 **Team Contributions & Git Workflow Note**  
->  
-> During the final sprint, a lot of work was merged from a single machine/account to avoid “it works locally” disasters – which makes the commit history look more solo than the actual effort.  
-> To keep things transparent for evaluation, here is how the project was really built, piece by piece:
-> - **Purvansh Joshi** – **Architecture & backend brain**: FastAPI services, auth & security, database models, vector search integration, CI/CD and deployment wiring  
->   (`backend/app/api`, `backend/app/core`, `backend/app/models`, `.github/workflows`, `DEPLOYMENT.md`, `START_HERE.md`).  
-> - **Archit Mittal** – **Frontend & UX wizardry**: React + Vite SPA, dashboards, pages, shared components, and API integration  
->   (`frontend/src/pages`, `frontend/src/components`, `frontend/src/services`, frontend integration fixes).  
-> - **Saurabh Rawat** – **Scrapers & data pipelines**: Hackathon scrapers, ingestion logic, and data flow that powers unified hackathon discovery  
->   (`scrapers/`, scraper configs, data preparation notes).  
-> - **Kanishk Joshi** – **DevOps, testing & reliability**: Setup and testing docs, troubleshooting flows, helper scripts, and Docker/deployment utilities  
->   (`SETUP.md`, `TESTING.md`, `QUICKSTART.md`, `docker/`, `RUN_*.bat`, `Start-Servers.ps1`).  
->  
-> From this point onward, we are strictly using feature branches + PRs + reviews so that Git history reflects the teamwork as clearly as the demo does. 🚀
-
-
 [![CI/CD Status](https://github.com/purvanshjoshi/hackquest-ai/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/purvanshjoshi/hackquest-ai/actions)
 [![React](https://img.shields.io/badge/React-18.2-61dafb?style=flat-square&logo=react)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.11-3776ab?style=flat-square&logo=python)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+
+> 🧩 **Team Contributions & Git Workflow Note**  
+>  
+> During the final sprint, a lot of code was assembled on a single machine and pushed from one GitHub account so that we could ship a stable, end‑to‑end demo instead of fighting merge conflicts at 3 AM.  
+> That makes the commit graph look like a solo speedrun, but the system you see here is very much a team sport. To keep things fair and transparent for evaluation, here is how HackQuest AI was actually built:
+> 
+> - **Purvansh Joshi – Architecture & Backend Orchestration**  
+>   Designed the overall system architecture, core domain models, and service boundaries. Implemented FastAPI services, authentication & authorization flows, judge-simulation and matching endpoints, and integrated the database, vector search, and caching layers. Also wired up CI/CD, environment configuration, and deployment workflows.  
+>   _Key areas:_ `backend/app/api`, `backend/app/core`, `backend/app/models`, `backend/app/services`, `.github/workflows`, `DEPLOYMENT.md`, `START_HERE.md`.
+> 
+> - **Archit Mittal – Frontend Experience & Interaction Design**  
+>   Crafted the React + Vite single-page app, dashboard flows, navigation, and reusable components that turn the backend into a smooth UX for hackers, organizers, and judges. Led API integration on the client side, state management, and UI polish so that complex features (matching, generation, analytics) feel approachable instead of “research lab only”.  
+>   _Key areas:_ `frontend/src/pages`, `frontend/src/components`, `frontend/src/routes`, `frontend/src/services`, frontend integration and styling fixes.
+> 
+> - **Saurabh Rawat – Scraping Engine & Data Pipelines**  
+>   Built and tuned the scraping layer that continuously discovers hackathons from multiple platforms, normalizes them into a unified schema, and feeds the ranking/matching pipeline. Handled selectors, anti‑break safeguards, and data quality checks so that the platform stays useful even when external sites change.  
+>   _Key areas:_ `scrapers/`, scraper configs, ingestion scripts, data preparation notes, scraping-related troubleshooting.
+> 
+> - **Kanishk Joshi – DevOps, Testing, and Reliability Engineering**  
+>   Focused on making the project reproducible and stable: local setup flows, environment bootstrapping, Dockerization, helper scripts, and testing guidance. Documented troubleshooting paths, ensured services come up in the right order, and helped keep “it works on my machine” to a minimum during the hackathon rush.  
+>   _Key areas:_ `SETUP.md`, `TESTING.md`, `QUICKSTART.md`, `docker/`, `RUN_*.bat`, `Start-Servers.ps1`, infra and quality-of-life tooling.
+> 
+> From this point onward, we are sticking to a proper **feature-branch → PR → review → merge** workflow so that future commits tell the same story our demo already does: four people, one platform, no accidental solo speedrun. 🚀
+
 
 **AI-Powered Hackathon Matching & Autonomous Code Generation Platform**
 
