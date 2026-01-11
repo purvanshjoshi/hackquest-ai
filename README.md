@@ -828,29 +828,6 @@ See SETUP.md for complete list.
 ---
 
 
-## Planned Updates for Round 2
-
-In Round 2, we will focus on making HackQuest AI more reliable, intelligent, and impactful for hackathon participants.
-​
-
-Expand hackathon coverage: Integrate more hackathon portals and improve scraping resilience against layout changes, rate limits, and intermittent failures to ensure fresher, more complete listings.
-​
-
-Stronger skill-based matching: Enrich the user skill graph, factor in past participation history, and introduce feedback loops so recommendations become more accurate and personalized over time.
-​
-
-Smarter AI submission assistant: Add track-specific templates, judge-criteria–aware prompts, and safety checks so generated abstracts, problem statements, and solution sections align better with hackathon rubrics.
-​
-
-UX and workflow polish: Refine the dashboard with better search, filters, bookmarking, status tracking, and mobile responsiveness to create a smoother end-to-end discovery and planning experience.
-​
-
-Performance and reliability: Introduce caching, background jobs, and more robust error handling to keep response times low and the platform stable under higher traffic.
-​
-
-Analytics and insights: Provide simple analytics like applied hackathons, success ratios, and identified skill gaps, turning HackQuest AI into a personal hackathon strategy coach rather than just a listing tool
-
----
 
 ## 🆘 Troubleshooting
 
