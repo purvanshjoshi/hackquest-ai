@@ -1,5 +1,21 @@
 # HackQuest AI 🧠⚡
 
+> 🧩 **Team Contributions & Git Workflow Note**  
+>  
+> During the final sprint, a lot of work was merged from a single machine/account to avoid “it works locally” disasters – which makes the commit history look more solo than the actual effort.  
+> To keep things transparent for evaluation, here is how the project was really built, piece by piece:
+> - **Purvansh Joshi** – **Architecture & backend brain**: FastAPI services, auth & security, database models, vector search integration, CI/CD and deployment wiring  
+>   (`backend/app/api`, `backend/app/core`, `backend/app/models`, `.github/workflows`, `DEPLOYMENT.md`, `START_HERE.md`).  
+> - **Archit Mittal** – **Frontend & UX wizardry**: React + Vite SPA, dashboards, pages, shared components, and API integration  
+>   (`frontend/src/pages`, `frontend/src/components`, `frontend/src/services`, frontend integration fixes).  
+> - **Saurabh Rawat** – **Scrapers & data pipelines**: Hackathon scrapers, ingestion logic, and data flow that powers unified hackathon discovery  
+>   (`scrapers/`, scraper configs, data preparation notes).  
+> - **Kanishk Joshi** – **DevOps, testing & reliability**: Setup and testing docs, troubleshooting flows, helper scripts, and Docker/deployment utilities  
+>   (`SETUP.md`, `TESTING.md`, `QUICKSTART.md`, `docker/`, `RUN_*.bat`, `Start-Servers.ps1`).  
+>  
+> From this point onward, we are strictly using feature branches + PRs + reviews so that Git history reflects the teamwork as clearly as the demo does. 🚀
+
+
 [![CI/CD Status](https://github.com/purvanshjoshi/hackquest-ai/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/purvanshjoshi/hackquest-ai/actions)
 [![React](https://img.shields.io/badge/React-18.2-61dafb?style=flat-square&logo=react)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
